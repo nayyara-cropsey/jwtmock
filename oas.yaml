@@ -1,0 +1,149 @@
+swagger: "2.0"
+info:
+  description: API for JWT Mock
+  version: 1.0.0
+  title: JWT Mock
+
+tags:
+  - name: JWKS
+    description: JSON Web Token Keyset
+  - name: JWT
+    description: JSON Web Token
+
+
+paths:
+  /.well-known/jwks.json:
+    get:
+      tags:
+        - JWKS
+      summary: Returns JSON Web Keyset used to sign JWTs
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/jwkset"
+    post:
+      tags:
+        - JWKS
+      summary: Forces the current JWKS to be rotated and replaced with a new one
+      produces:
+        - application/json
+      responses:
+        201:
+          description: Success
+        500:
+          description: Internal Error
+          schema:
+            $ref: "#/definitions/error"
+  /generate-jwt:
+    post:
+      tags:
+        - JWT
+      summary: Generates a JWT with the claims posted in the body.
+      description: Certain claims are required such as sub (subject), iat (issued at) and exp (expires at).
+      parameters:
+        - in: body
+          name: request body
+          description: information about the organization being created
+          schema:
+            $ref: "#/definitions/claims"
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Successfully created
+          schema:
+            $ref: "#/definitions/jwt"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/error"
+        500:
+          description: Internal Error
+          schema:
+            $ref: "#/definitions/error"
+
+definitions:
+  jwk:
+    type: object
+    properties:
+      alg:
+        type: string
+        description: Algorithm used to sign JWT
+        example: RS256
+      e:
+        type: string
+        example: AQAB
+      kid:
+        description: The key ID parameter is used to match a specific key.  This
+            is used, for instance, to choose among a set of keys within a JWK Set
+            during key rollover
+        type: string
+        example: cc822394-82c9-11ec-abae-3e22fbc2e3ae
+      kty:
+        description: Key type parameter identifies the cryptographic algorithm
+          family used with the key, such as RSA or EC.
+        type: string
+        example: RSA
+      n:
+        type: string
+        example: 33rLP5iOuTfs4bQKG0EotG8C003FatBgjlTsoR5FfIoGbROf-g0I_-8QLcCA9StFbu1l63cyd-zgcM-E9x1HfqxR99xLVxKQqZR9Q-zyHk-IJoFGo-XWp4GiK_cV9CD3z70wX6ySLSTvcbRXRILSJEVvGntPkB5AQwJ-pusPus8
+      use:
+        description: Identifies the intended use of the public key. Can be sig (signature) or enc (encryption)
+        type: string
+        example: sig
+      x5c:
+        description:  X.509 Certificate Chain – chain of certificates used for verification.
+        type: array
+        items:
+          type: string
+          example: MIIB0TCCATqgAwIBAgIBJzANBgkqhkiG9w0BAQsFADATMREwDwYDVQQKEwhKV1QgTW9jazAeFw0yMjAxMzExOTEyNTdaFw0yMjAyMDExOTEyNTdaMBMxETAPBgNVBAoTCEpXVCBNb2NrMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDfess/mI65N+zhtAobQSi0bwLTTcVq0GCOVOyhHkV8igZtE5/6DQj/7xAtwID1K0Vu7WXrdzJ37OBwz4T3HUd+rFH33EtXEpCplH1D7PIeT4gmgUaj5dangaIr9xX0IPfPvTBfrJItJO9xtFdEgtIkRW8ae0+QHkBDAn6m6w+6zwIDAQABozUwMzAOBgNVHQ8BAf8EBAMCBaAwEwYDVR0lBAwwCgYIKwYBBQUHAwEwDAYDVR0TAQH/BAIwADANBgkqhkiG9w0BAQsFAAOBgQDVqaUj95gimKeWaxGQX3nSPs3zkM1cll6igQRA57T1PXOdY+LD+tlWQDJnKHYTGxCjSdNwqujPimrz6C2I+T3sB7W1M3zEsOUv/gYiBMK/2IyJlo93WaY8U31sAztxUb47g4+YqVeaX4lg2SRala4/cVyjN0QU9AgwbvYGwFdTWg==
+      x5kt:
+        description: X.509 Certificate Thumbprint – Used to identify specific certificates
+        type: string
+        example: 1o2uPYGVDaxWfwvg9GewbbChrjk
+
+  jwkset:
+    type: object
+    properties:
+      keys:
+        description: An array of JWK values
+        type: array
+        items:
+          $ref: '#/definitions/jwk'
+
+  claims:
+    type: object
+    description: Claims to sign with the JWT
+    required: [sub, iat, exp]
+    example:
+      sub: nayyara.samuel
+      iat: 1643651018
+      exp: 1643748940
+      scope: "openid profile offline_access"
+      aud: [
+        "https://api.mine.go"
+      ]
+
+  jwt:
+    type: object
+    properties:
+      token:
+        type: string
+        description: JWT token generated from current signing key
+        example: eyJhbGciOiJSUzI1NiIsImtpZCI6IjgyYzQ1NTdlLTgyZDgtMTFlYy1iNTc0LTNlMjJmYmMyZTNhZSIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiaHR0cHM6Ly9hcGkubWluZS5nbyJdLCJleHAiOjE2NDM3NDg5NDAsImlhdCI6MTY0MzY1MTAxOCwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBvZmZsaW5lX2FjY2VzcyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTAxNTIxNjI2NDA4NzcyMzIwNTM3In0.C-l9vGyy0rljrPItSCahrgnsIX-0mm08Y8oLQxbGpAxkWaBSv81o4aPTA0L9BTRwmkuetjBe9TNA9ApxIMaeH1xuboMHADFylW5kcecy8NQxMR_dKcX7a8P3nw18snNTso8xYXhPQL2OnYB_OUbonMI2nu0p-2QEhBlyEOPAMG8
+
+  error:
+    type: object
+    properties:
+      message:
+        description: Human-readable message
+        type: string
+      error:
+        description: Underlying error
+        type: string
+    example:
+      message: Failed to validate claims
+      example: token has expired
