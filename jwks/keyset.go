@@ -1,6 +1,7 @@
 package jwks
 
 import (
+	//nolint:gosec // ignore weak cryptographic algorithm warning
 	"crypto/sha1"
 	"crypto/x509"
 	"fmt"
@@ -44,6 +45,7 @@ func (t *Generator) GenerateJWKSet() (*jose.JSONWebKeySet, *types.SigningKey, er
 		return nil, nil, fmt.Errorf("cert: %w", err)
 	}
 
+	// nolint:gosec // ignore weak cryptographic algorithm warning
 	x5tSHA1 := sha1.Sum(cert.Raw)
 
 	return &jose.JSONWebKeySet{

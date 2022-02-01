@@ -12,8 +12,8 @@ import (
 type KeyStore struct {
 	generator *jwks.Generator
 
-	key  *types.SigningKey
-	jwks *jose.JSONWebKeySet
+	key    *types.SigningKey
+	jwkSet *jose.JSONWebKeySet
 
 	m sync.Mutex
 }
@@ -36,12 +36,12 @@ func (k *KeyStore) GenerateNew() error {
 	k.m.Lock()
 	defer k.m.Unlock()
 
-	jwks, key, err := k.generator.GenerateJWKSet()
+	jwkSet, key, err := k.generator.GenerateJWKSet()
 	if err != nil {
 		return err
 	}
 
-	k.jwks = jwks
+	k.jwkSet = jwkSet
 	k.key = key
 
 	return nil
@@ -49,7 +49,7 @@ func (k *KeyStore) GenerateNew() error {
 
 // GetJWKS returns the currently stored JWKS.
 func (k *KeyStore) GetJWKS() *jose.JSONWebKeySet {
-	return k.jwks
+	return k.jwkSet
 }
 
 // GetSigningKey returns the currently stored signing key.

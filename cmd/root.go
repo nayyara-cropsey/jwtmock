@@ -17,9 +17,12 @@ import (
 	"go.uber.org/zap"
 )
 
+// ConfigKeyType is a special type for setting config key
+type ConfigKeyType string
+
 const (
 	// ConfigKey is the key for config set in the context for root command.
-	ConfigKey = "config"
+	ConfigKey ConfigKeyType = "config"
 
 	// server is allowed this  much time to shutdown
 	serverShutdownTimeout = time.Second * 5
@@ -71,9 +74,8 @@ var RootCmd = &cobra.Command{
 			Handler: mainHandler,
 
 			// add timeout to avoid long I/O waits
-			ReadTimeout:    time.Minute,
-			WriteTimeout:   time.Minute,
-			MaxHeaderBytes: 1 << 20,
+			ReadTimeout:  time.Minute,
+			WriteTimeout: time.Minute,
 		}
 
 		// start server
@@ -87,21 +89,17 @@ var RootCmd = &cobra.Command{
 		}()
 
 		// handle cancellation and shutdown server with timeout before exiting
-		select {
-		case <-cmd.Context().Done():
-			timeoutCtx, timeoutCancel := context.WithTimeout(context.Background(), serverShutdownTimeout)
-			defer timeoutCancel()
+		<-cmd.Context().Done()
 
-			err := s.Shutdown(timeoutCtx)
-			if err != nil {
-				logger.Error("Error while shutting down server", zap.Error(err))
-				return err
-			}
+		timeoutCtx, timeoutCancel := context.WithTimeout(context.Background(), serverShutdownTimeout)
+		defer timeoutCancel()
 
-			logger.Info("Server shutdown complete")
+		if err := s.Shutdown(timeoutCtx); err != nil {
+			logger.Error("Error while shutting down server", zap.Error(err))
+			return err
 		}
 
-		logger.Info("Exiting")
+		logger.Info("Server shutdown complete")
 
 		return nil
 	},

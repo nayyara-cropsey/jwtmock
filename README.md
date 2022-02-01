@@ -6,7 +6,7 @@ JWT server.
 
 These JWTs can help you cover various testing scenarios.
 
-* Create tokens for users in your test fixtures for consistent test data/indentities.
+* Create tokens for users in your tests using with fake identities.
 * Create tokens with various scopes/permissions for testing access control.
 
 ## Quick Start

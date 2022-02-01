@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	orgName = "JWT Mock"
+	orgName     = "JWT Mock"
+	randIntSize = 100
 )
 
 // CertificateGenerator is used to generate certificates.
@@ -27,7 +28,7 @@ func NewCertificateGenerator(lifeTime time.Duration) *CertificateGenerator {
 
 // CreateParent generates a X.509 parent/root certificate for use in authorization servers.
 func (c *CertificateGenerator) CreateParent() (*x509.Certificate, error) {
-	serialNumber, err := rand.Int(rand.Reader, big.NewInt(100))
+	serialNumber, err := rand.Int(rand.Reader, big.NewInt(randIntSize))
 	if err != nil {
 		return nil, fmt.Errorf("serial number: %w", err)
 	}
