@@ -1,53 +1,68 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"jwt-mock/handlers"
-	"jwt-mock/jwks"
-	"jwt-mock/service"
-	"jwt-mock/store"
-	"net/http"
-	"time"
+	"jwt-mock/cmd"
+	"jwt-mock/types"
+	"os"
+	"os/signal"
+	"strings"
 
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
+	"github.com/spf13/viper"
+)
+
+const (
+	configEnvPrefix = "JWT_MOCK"
+	configFormat    = "yaml"
+	// using a hard-coded config to avoid shipping a config.yaml file
+	// this just provides the defaults - which are overridden via ENV vars.
+	defaultConfig = `
+port: 80
+key_length: 1024
+cert_life_days: 1
+`
 )
 
 func main() {
-	logger, err := zap.NewDevelopment()
+	rootCmd := cmd.RootCmd
+
+	// load config
+	config, err := initConfig()
 	if err != nil {
-		fmt.Println("Error logger", err)
-		return
+		rootCmd.Println("Error loading config:", err)
+		os.Exit(1)
 	}
 
-	g := gin.Default()
-	mainGroup := g.Group("")
+	// create context with config set on it
+	configCtx := context.WithValue(context.Background(), cmd.ConfigKey, config)
 
-	certGenerator := service.NewCertificateGenerator(time.Hour * 24)
-	keyGenerator := jwks.NewGenerator(certGenerator, service.NewRSAKeyGenerator(), 1024)
-	keyStore, err := store.NewKeyStore(keyGenerator)
-	if err != nil {
-		logger.Error("Error while initializing key store", zap.Error(err))
-		return
+	// handle shutdown by user pressing Ctrl+C
+	ctx, cancel := signal.NotifyContext(configCtx, os.Interrupt)
+	defer cancel()
+
+	// execute command
+	if err := rootCmd.ExecuteContext(ctx); err != nil {
+		rootCmd.Println("Error in command:", err)
+		os.Exit(1)
+	}
+}
+
+// initConfig initializes viper with default config and loads any overrides via ENV vars.
+func initConfig() (*types.Config, error) {
+	viper.AutomaticEnv()
+	viper.SetConfigType(configFormat)
+	viper.SetEnvPrefix(configEnvPrefix)
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	if err := viper.ReadConfig(strings.NewReader(defaultConfig)); err != nil {
+		return nil, fmt.Errorf("initialize config: %w", err)
 	}
 
-	jwksHandler := handlers.NewJWKSHandler(keyStore, logger)
-	jwksHandler.RegisterDefaultPaths(mainGroup)
-
-	jwtHandler := handlers.NewJWTHandler(keyStore, logger)
-	jwtHandler.RegisterDefaultPaths(mainGroup)
-
-	s := &http.Server{
-		Addr:    ":8081",
-		Handler: g,
-		// add timeout to avoid long I/O waits
-		ReadTimeout:    2 * time.Minute,
-		WriteTimeout:   2 * time.Minute,
-		MaxHeaderBytes: 1 << 20,
+	config := new(types.Config)
+	if err := viper.Unmarshal(config); err != nil {
+		return nil, fmt.Errorf("unmarshal config: %w", err)
 	}
 
-	if err := s.ListenAndServe(); err != nil {
-		logger.Error("Error while shutting down server", zap.Error(err))
-		return
-	}
+	return config, nil
 }

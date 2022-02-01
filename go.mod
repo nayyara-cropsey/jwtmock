@@ -8,6 +8,8 @@ require (
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/google/uuid v1.3.0
 	github.com/mitchellh/mapstructure v1.4.3
+	github.com/spf13/cobra v1.3.0
+	github.com/spf13/viper v1.10.1
 	go.uber.org/zap v1.20.0
 	golang.org/x/crypto v0.0.0-20220128200615-198e4374d7ed // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0
