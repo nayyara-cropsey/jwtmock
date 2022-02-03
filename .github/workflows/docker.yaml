@@ -1,0 +1,29 @@
+name: Docker Image
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get Tag
+        id: get_tag
+        run: |
+          TAG=$(basename ${GITHUB_REF})
+          echo "::set-output name=TAG::$TAG"
+
+      - name: Build And Publish Image
+        uses: ilteoood/docker_buildx@master
+        with:
+          publish: true
+          imageName: nayyarasamuel7/jwt-mock
+          dockerUser: nayyarasamuel7
+          dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
+          tag: ${{ steps.get_tag.outputs.TAG }},latest
+          dockerFile: Dockerfile
+          platform: linux/amd64,linux/arm64
+          buildArg: Version=${{ steps.get_tag.outputs.TAG }}

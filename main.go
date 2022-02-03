@@ -13,16 +13,11 @@ import (
 )
 
 const (
-	configEnvPrefix = "JWT_MOCK"
-	configFormat    = "yaml"
-	// using a hard-coded config to avoid shipping a config.yaml file
-	// this just provides the defaults - which are overridden via ENV vars.
-	defaultConfig = `
-port: 80
-key_length: 1024
-cert_life_days: 1
-`
+	configEnvPrefix   = "JWT_MOCK"
+	defaultConfigFile = "config.yaml"
 )
+
+var configFile = defaultConfigFile
 
 func main() {
 	if err := executeCmd(); err != nil {
@@ -33,6 +28,7 @@ func main() {
 // executeCmd executes the main cobra command and returns any errors.
 func executeCmd() error {
 	rootCmd := cmd.RootCmd
+	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", defaultConfigFile, "config file")
 
 	// load config
 	config, err := initConfig()
@@ -60,12 +56,12 @@ func executeCmd() error {
 // initConfig initializes viper with default config and loads any overrides via ENV vars.
 func initConfig() (*types.Config, error) {
 	viper.AutomaticEnv()
-	viper.SetConfigType(configFormat)
+	viper.SetConfigFile(configFile)
 	viper.SetEnvPrefix(configEnvPrefix)
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	if err := viper.ReadConfig(strings.NewReader(defaultConfig)); err != nil {
-		return nil, fmt.Errorf("initialize config: %w", err)
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, fmt.Errorf("read config: %w", err)
 	}
 
 	config := new(types.Config)
