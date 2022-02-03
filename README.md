@@ -1,3 +1,7 @@
+[![main](https://github.com/nayyara-samuel/jwt-mock/workflows/Build/badge.svg)](https://github.com/nayyara-samuel/jwt-mock/actions?query=workflow%3ABuild)
+[![docker](https://github.com/nayyara-samuel/jwt-mock/workflows/Docker/badge.svg)](https://github.com/nayyara-samuel/jwt-mock/actions?query=workflow%3ADocker)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 # JWT Mock
 
 JWT Mock is a web server that is used to mock out a JWT-based authorization service used by your API/service. Mocking
@@ -41,5 +45,20 @@ about the API endpoints.
 
 You will also find helpful examples using `curl` [here](./docs/curl_example.md).
 
-## Docker 
+## Docker
 
+This image is pushed to `nayyarasamuel7/jwt-mock` repository. Follow these steps to get it running:
+
+```bash 
+docker pull nayyarasamuel7/jwt-mock:latest
+docker run -p 80:80 nayyarasamuel7/jwt-mock:latest
+```
+
+You can override config values by setting environment variables. For example:
+
+```bash 
+docker run -p 80:80 --env JWT_MOCK_KEY_LENGTH=2048 nayyarasamuel7/jwt-mock:latest
+```
+
+The Docker repo also have various other immutable release tags pushed that match Git tags on this repo with the
+format `v*`.

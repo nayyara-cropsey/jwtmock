@@ -1,0 +1,27 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        name: Checkout
+      - uses: actions/setup-go@v2
+        name: Setup Go
+        with:
+          go-version: '^1.16.1'
+      - name: Compile
+        run: make build
+      - name: Go Lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.44
+          only-new-issues: true
