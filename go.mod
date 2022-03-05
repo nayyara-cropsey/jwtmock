@@ -1,4 +1,4 @@
-module jwt-mock
+module github.com/nayyara-samuel/jwt-mock
 
 go 1.16
 

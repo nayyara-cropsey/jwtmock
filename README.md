@@ -45,6 +45,31 @@ about the API endpoints.
 
 You will also find helpful examples using `curl` [here](./docs/curl_example.md).
 
+## Go Tests
+
+The `jwtmocktest` package provides a HTTP test server similar to the `httptest` package. It can be used in tests to start
+a test JWT mock HTTP server and used as the authorization server for a microservice using JWT authorization.
+
+```go 
+import "github.com/nayyara-samuel/jwt-mock/jwtmocktest"
+
+// setup server
+server, err := jwtmocktest.NewServer()
+
+// wire to as an authorization server to a dependent microservice
+setAuthorizationServerURL(server.URL)
+
+// generate a JWT for use in Authorization header
+token, err := server.GenerateJWT(jwt.Claims{
+  "sub": "test-user",  // subject
+  "iat": 1646451994 // issued-at epoch time
+  "exp": 1646451994 // expiration epoch time 
+})
+
+// shutdown server 
+server.Close()
+```
+
 ## Docker
 
 This image is pushed to `nayyarasamuel7/jwt-mock` repository. Follow these steps to get it running:

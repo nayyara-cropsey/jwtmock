@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"jwt-mock/cmd"
-	"jwt-mock/types"
 	"os"
 	"os/signal"
 	"strings"
+
+	"github.com/nayyara-samuel/jwt-mock/cmd"
+	"github.com/nayyara-samuel/jwt-mock/types"
 
 	"github.com/spf13/viper"
 )

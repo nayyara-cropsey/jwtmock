@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"jwt-mock/jwt"
-	"jwt-mock/store"
 	"net/http"
+
+	"github.com/nayyara-samuel/jwt-mock/jwt"
+	"github.com/nayyara-samuel/jwt-mock/service"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -18,12 +19,12 @@ const JWTDefaultPath = "/generate-jwt"
 
 // JWTHandler provides handlers for working with JWTs
 type JWTHandler struct {
-	keyStore *store.KeyStore
+	keyStore *service.KeyStore
 	logger   *zap.Logger
 }
 
 // NewJWTHandler is the preferred way to create a JWTHandler instance.
-func NewJWTHandler(keyStore *store.KeyStore, logger *zap.Logger) *JWTHandler {
+func NewJWTHandler(keyStore *service.KeyStore, logger *zap.Logger) *JWTHandler {
 	return &JWTHandler{
 		keyStore: keyStore,
 		logger:   logger,

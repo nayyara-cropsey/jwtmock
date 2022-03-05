@@ -2,7 +2,8 @@ package jwks
 
 import (
 	"crypto/x509"
-	"jwt-mock/types"
+
+	"github.com/nayyara-samuel/jwt-mock/types"
 )
 
 type certGenerator interface {

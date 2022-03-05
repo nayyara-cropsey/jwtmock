@@ -4,15 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"jwt-mock/handlers"
-	"jwt-mock/jwks"
-	"jwt-mock/service"
-	"jwt-mock/store"
-	"jwt-mock/types"
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/nayyara-samuel/jwt-mock/handlers"
+	"github.com/nayyara-samuel/jwt-mock/jwks"
+	"github.com/nayyara-samuel/jwt-mock/service"
+	"github.com/nayyara-samuel/jwt-mock/types"
+
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -51,24 +50,15 @@ var RootCmd = &cobra.Command{
 
 		logger.Info("Config", zap.Stringer("config", config))
 
-		mainHandler := gin.Default()
-		mainGroup := mainHandler.Group("")
-
 		certGenerator := service.NewCertificateGenerator(config.GetCertificateDuration())
 		keyGenerator := jwks.NewGenerator(certGenerator, service.NewRSAKeyGenerator(), config.KeyLength)
-		keyStore, err := store.NewKeyStore(keyGenerator)
+		keyStore, err := service.NewKeyStore(keyGenerator)
 		if err != nil {
 			logger.Error("Error while initializing key store", zap.Error(err))
 			return err
 		}
 
-		// register handlers for server
-		jwksHandler := handlers.NewJWKSHandler(keyStore, logger)
-		jwksHandler.RegisterDefaultPaths(mainGroup)
-
-		jwtHandler := handlers.NewJWTHandler(keyStore, logger)
-		jwtHandler.RegisterDefaultPaths(mainGroup)
-
+		mainHandler := handlers.NewHandler(keyStore, logger)
 		s := &http.Server{
 			Addr:    fmt.Sprintf(":%d", config.Port),
 			Handler: mainHandler,

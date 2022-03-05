@@ -1,9 +1,10 @@
-package store
+package service
 
 import (
-	"jwt-mock/jwks"
-	"jwt-mock/types"
 	"sync"
+
+	"github.com/nayyara-samuel/jwt-mock/jwks"
+	"github.com/nayyara-samuel/jwt-mock/types"
 
 	"gopkg.in/square/go-jose.v2"
 )

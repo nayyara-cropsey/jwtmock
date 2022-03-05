@@ -5,7 +5,8 @@ import (
 	"crypto/sha1"
 	"crypto/x509"
 	"fmt"
-	"jwt-mock/types"
+
+	"github.com/nayyara-samuel/jwt-mock/types"
 
 	"gopkg.in/square/go-jose.v2"
 )

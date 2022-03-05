@@ -3,8 +3,9 @@ package jwt
 import (
 	"errors"
 	"fmt"
-	"jwt-mock/types"
 	"time"
+
+	"github.com/nayyara-samuel/jwt-mock/types"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/mitchellh/mapstructure"
@@ -13,6 +14,9 @@ import (
 const keyID = "kid"
 
 var (
+	// Ensure Claims complies with jwt.Claims interface
+	_ jwt.Claims = Claims{}
+
 	// ErrExpiredToken means the JWT token has expired.
 	ErrExpiredToken = errors.New("token has expired (seconds)")
 
@@ -38,7 +42,7 @@ func (c Claims) Valid() error {
 	r := requiredClaims{}
 	err := mapstructure.Decode(c, &r)
 	if err != nil {
-		return err
+		return fmt.Errorf("check required claims: %w", err)
 	}
 
 	expiresAt := time.Unix(r.ExpiredAt, 0)

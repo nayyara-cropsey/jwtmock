@@ -4,7 +4,8 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
-	"jwt-mock/types"
+
+	"github.com/nayyara-samuel/jwt-mock/types"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
