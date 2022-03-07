@@ -7,8 +7,8 @@ import (
 	"os/signal"
 	"strings"
 
-	"github.com/nayyara-samuel/jwt-mock/cmd"
-	"github.com/nayyara-samuel/jwt-mock/types"
+	"github.com/nayyara-cropsey/jwt-mock/cmd"
+	"github.com/nayyara-cropsey/jwt-mock/types"
 
 	"github.com/spf13/viper"
 )

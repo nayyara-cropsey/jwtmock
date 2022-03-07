@@ -3,10 +3,10 @@ package jwtmocktest
 import (
 	"fmt"
 
-	"github.com/nayyara-samuel/jwt-mock/handlers"
-	"github.com/nayyara-samuel/jwt-mock/jwks"
-	"github.com/nayyara-samuel/jwt-mock/jwt"
-	"github.com/nayyara-samuel/jwt-mock/service"
+	"github.com/nayyara-cropsey/jwt-mock/handlers"
+	"github.com/nayyara-cropsey/jwt-mock/jwks"
+	"github.com/nayyara-cropsey/jwt-mock/jwt"
+	"github.com/nayyara-cropsey/jwt-mock/service"
 
 	"net/http/httptest"
 

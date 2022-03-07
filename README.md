@@ -1,5 +1,5 @@
-[![main](https://github.com/nayyara-samuel/jwt-mock/workflows/Build/badge.svg)](https://github.com/nayyara-samuel/jwt-mock/actions?query=workflow%3ABuild)
-[![docker](https://github.com/nayyara-samuel/jwt-mock/workflows/Docker/badge.svg)](https://github.com/nayyara-samuel/jwt-mock/actions?query=workflow%3ADocker)
+[![main](https://github.com/nayyara-cropsey/jwt-mock/workflows/Build/badge.svg)](https://github.com/nayyara-cropsey/jwt-mock/actions?query=workflow%3ABuild)
+[![docker](https://github.com/nayyara-cropsey/jwt-mock/workflows/Docker/badge.svg)](https://github.com/nayyara-cropsey/jwt-mock/actions?query=workflow%3ADocker)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # JWT Mock
@@ -51,7 +51,7 @@ The `jwtmocktest` package provides a HTTP test server similar to the `httptest` 
 a test JWT mock HTTP server and used as the authorization server for a microservice using JWT authorization.
 
 ```go 
-import "github.com/nayyara-samuel/jwt-mock/jwtmocktest"
+import "github.com/nayyara-cropsey/jwt-mock/jwtmocktest"
 
 // setup server
 server, err := jwtmocktest.NewServer()

@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/nayyara-samuel/jwt-mock/handlers"
-	"github.com/nayyara-samuel/jwt-mock/jwks"
-	"github.com/nayyara-samuel/jwt-mock/service"
-	"github.com/nayyara-samuel/jwt-mock/types"
+	"github.com/nayyara-cropsey/jwt-mock/handlers"
+	"github.com/nayyara-cropsey/jwt-mock/jwks"
+	"github.com/nayyara-cropsey/jwt-mock/service"
+	"github.com/nayyara-cropsey/jwt-mock/types"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"

@@ -6,7 +6,7 @@ import (
 	"crypto/x509"
 	"fmt"
 
-	"github.com/nayyara-samuel/jwt-mock/types"
+	"github.com/nayyara-cropsey/jwt-mock/types"
 
 	"gopkg.in/square/go-jose.v2"
 )

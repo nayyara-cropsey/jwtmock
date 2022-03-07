@@ -5,7 +5,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 
-	"github.com/nayyara-samuel/jwt-mock/types"
+	"github.com/nayyara-cropsey/jwt-mock/types"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"

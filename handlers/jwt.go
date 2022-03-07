@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/nayyara-samuel/jwt-mock/jwt"
-	"github.com/nayyara-samuel/jwt-mock/service"
+	"github.com/nayyara-cropsey/jwt-mock/jwt"
+	"github.com/nayyara-cropsey/jwt-mock/service"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

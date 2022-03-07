@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/nayyara-samuel/jwt-mock/service"
+	"github.com/nayyara-cropsey/jwt-mock/service"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

@@ -1,16 +1,14 @@
-module github.com/nayyara-samuel/jwt-mock
+module github.com/nayyara-cropsey/jwt-mock
 
 go 1.16
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/gin-gonic/gin v1.7.7
-	github.com/google/go-cmp v0.5.7 // indirect
-	github.com/google/uuid v1.3.0
-	github.com/mitchellh/mapstructure v1.4.3
-	github.com/spf13/cobra v1.3.0
-	github.com/spf13/viper v1.10.1
-	go.uber.org/zap v1.20.0
-	golang.org/x/crypto v0.0.0-20220128200615-198e4374d7ed // indirect
-	gopkg.in/square/go-jose.v2 v2.6.0
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/gin-gonic/gin v1.7.7 // indirect
+	github.com/google/uuid v1.3.0 // indirect
+	github.com/mitchellh/mapstructure v1.4.3 // indirect
+	github.com/spf13/cobra v1.3.0 // indirect
+	github.com/spf13/viper v1.10.1 // indirect
+	go.uber.org/zap v1.21.0 // indirect
+	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )

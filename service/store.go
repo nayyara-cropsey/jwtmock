@@ -3,8 +3,8 @@ package service
 import (
 	"sync"
 
-	"github.com/nayyara-samuel/jwt-mock/jwks"
-	"github.com/nayyara-samuel/jwt-mock/types"
+	"github.com/nayyara-cropsey/jwt-mock/jwks"
+	"github.com/nayyara-cropsey/jwt-mock/types"
 
 	"gopkg.in/square/go-jose.v2"
 )
