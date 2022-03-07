@@ -5,14 +5,10 @@ import (
 	"crypto/rsa"
 	"fmt"
 
+	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/nayyara-cropsey/jwt-mock/types"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
-)
-
-const (
-	RS256 = "RS256"
 )
 
 // RSAKeyGenerator generates key IDs and keys.
@@ -36,10 +32,9 @@ func (k *RSAKeyGenerator) GenerateKey(length int) (*types.SigningKey, error) {
 	}
 
 	return &types.SigningKey{
-		ID:            id.String(),
-		Key:           key,
-		SigningMethod: jwt.SigningMethodRS256,
-		Algorithm:     RS256,
-		PublicKey:     &key.PublicKey,
+		ID:        id.String(),
+		Key:       key,
+		Algorithm: jwa.RS256,
+		PublicKey: &key.PublicKey,
 	}, nil
 }

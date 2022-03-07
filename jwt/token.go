@@ -5,18 +5,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/lestrrat-go/jwx/jws"
+	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/nayyara-cropsey/jwt-mock/types"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/mitchellh/mapstructure"
 )
 
-const keyID = "kid"
-
 var (
-	// Ensure Claims complies with jwt.Claims interface
-	_ jwt.Claims = Claims{}
-
 	// ErrExpiredToken means the JWT token has expired.
 	ErrExpiredToken = errors.New("token has expired (seconds)")
 
@@ -68,8 +64,21 @@ func CreateToken(claims Claims, signingKey *types.SigningKey) (string, error) {
 		return "", fmt.Errorf("validation: %w", err)
 	}
 
-	jwtToken := jwt.NewWithClaims(signingKey.SigningMethod, claims)
-	jwtToken.Header[keyID] = signingKey.ID
+	headers := jws.NewHeaders()
+	if err := headers.Set(jws.KeyIDKey, signingKey.ID); err != nil {
+		return "", fmt.Errorf("JWS headers key: %w", err)
+	}
 
-	return jwtToken.SignedString(signingKey.Key)
+	options := []jwt.Option{jwt.WithHeaders(headers)}
+	for k, v := range claims {
+		options = append(options, jwt.WithClaimValue(k, v))
+	}
+
+	token := jwt.New()
+	signedToken, err := jwt.Sign(token, signingKey.Algorithm, signingKey.Key, options...)
+	if err != nil {
+		return "", fmt.Errorf("sign: %w", err)
+	}
+
+	return string(signedToken), nil
 }

@@ -1,9 +1,8 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
-
-	"gopkg.in/square/go-jose.v2/json"
 )
 
 func jsonMarshal(w http.ResponseWriter, v interface{}) error {

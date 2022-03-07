@@ -51,7 +51,10 @@ The `jwtmocktest` package provides a HTTP test server similar to the `httptest` 
 a test JWT mock HTTP server and used as the authorization server for a microservice using JWT authorization.
 
 ```go 
-import "github.com/nayyara-cropsey/jwt-mock/jwtmocktest"
+import (
+  "github.com/nayyara-cropsey/jwt-mock/jwtmocktest"
+  "github.com/nayyara-cropsey/jwt-mock/jwt"
+)
 
 // setup server
 server, err := jwtmocktest.NewServer()

@@ -3,10 +3,9 @@ package service
 import (
 	"sync"
 
+	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/nayyara-cropsey/jwt-mock/jwks"
 	"github.com/nayyara-cropsey/jwt-mock/types"
-
-	"gopkg.in/square/go-jose.v2"
 )
 
 // KeyStore is used to keep state about current JWKS and signing key.
@@ -14,7 +13,7 @@ type KeyStore struct {
 	generator *jwks.Generator
 
 	key    *types.SigningKey
-	jwkSet *jose.JSONWebKeySet
+	jwkSet *jwk.Set
 
 	m sync.Mutex
 }
@@ -49,7 +48,7 @@ func (k *KeyStore) GenerateNew() error {
 }
 
 // GetJWKS returns the currently stored JWKS.
-func (k *KeyStore) GetJWKS() *jose.JSONWebKeySet {
+func (k *KeyStore) GetJWKS() *jwk.Set {
 	return k.jwkSet
 }
 
