@@ -6,7 +6,6 @@ import (
 	"github.com/nayyara-cropsey/jwt-mock/jwt"
 	"github.com/nayyara-cropsey/jwt-mock/service"
 
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
@@ -32,20 +31,33 @@ func NewJWTHandler(keyStore *service.KeyStore, logger *zap.Logger) *JWTHandler {
 }
 
 // RegisterDefaultPaths registers the default paths for JWKS operations.
-func (j *JWTHandler) RegisterDefaultPaths(api *gin.RouterGroup) {
-	api.POST(JWTDefaultPath, j.Post)
+func (j *JWTHandler) RegisterDefaultPaths(api *http.ServeMux) {
+	api.HandleFunc(JWTDefaultPath, func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			j.Post(w, r)
+		default:
+			notFoundResponse(w)
+		}
+	})
 }
 
 // Post creates a signed JWT with the provided claims.
-func (j *JWTHandler) Post(c *gin.Context) {
+func (j *JWTHandler) Post(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	var claims jwt.Claims
-	if err := c.BindJSON(&claims); err != nil {
+	if err := jsonUnmarshal(r, &claims); err != nil {
 		j.logger.Error("failed to read claims", zap.Error(err))
 
-		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{
+		w.WriteHeader(http.StatusBadRequest)
+
+		if err = jsonMarshal(w, errorResponse{
 			Message: "Failed to read claims",
 			Error:   err.Error(),
-		})
+		}); err != nil {
+			j.logger.Error("Failed write JSON response", zap.Error(err))
+		}
 
 		return
 	}
@@ -55,13 +67,22 @@ func (j *JWTHandler) Post(c *gin.Context) {
 	if err != nil {
 		j.logger.Error("failed to generate JWT", zap.Error(err))
 
-		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{
+		w.WriteHeader(http.StatusBadRequest)
+
+		if err = jsonMarshal(w, errorResponse{
 			Message: "Failed to generate JWT",
 			Error:   err.Error(),
-		})
+		}); err != nil {
+			j.logger.Error("Failed write JSON response", zap.Error(err))
+		}
 
 		return
 	}
 
-	c.JSON(http.StatusOK, jwtResponse{Token: token})
+	if err := jsonMarshal(w, jwtResponse{Token: token}); err != nil {
+		j.logger.Error("Failed write JSON response", zap.Error(err))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

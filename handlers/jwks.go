@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/nayyara-cropsey/jwt-mock/service"
-
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
@@ -27,28 +25,47 @@ func NewJWKSHandler(keyStore *service.KeyStore, logger *zap.Logger) *JWKSHandler
 }
 
 // RegisterDefaultPaths registers the default paths for JWKS operations.
-func (j *JWKSHandler) RegisterDefaultPaths(api *gin.RouterGroup) {
-	api.GET(JWKSDefaultPath, j.Get)
-	api.POST(JWKSDefaultPath, j.Post)
+func (j *JWKSHandler) RegisterDefaultPaths(api *http.ServeMux) {
+	api.HandleFunc(JWKSDefaultPath, func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			j.Get(w, r)
+		case http.MethodPost:
+			j.Post(w, r)
+		default:
+			notFoundResponse(w)
+		}
+	})
 }
 
 // Get returns a JSON web key set for the authorization server.
-func (j *JWKSHandler) Get(c *gin.Context) {
-	c.JSON(http.StatusOK, j.keyStore.GetJWKS())
+func (j *JWKSHandler) Get(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	if err := jsonMarshal(w, j.keyStore.GetJWKS()); err != nil {
+		j.logger.Error("Failed write JSON response", zap.Error(err))
+		return
+	}
 }
 
 // Post forces a new JSON web key set to be created / the key set to be refreshed.
-func (j *JWKSHandler) Post(c *gin.Context) {
+func (j *JWKSHandler) Post(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	if err := j.keyStore.GenerateNew(); err != nil {
 		j.logger.Error("failed to generate new key set", zap.Error(err))
 
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{
+		w.WriteHeader(http.StatusInternalServerError)
+
+		if err = jsonMarshal(w, errorResponse{
 			Message: "Failed to refresh JWK set",
 			Error:   err.Error(),
-		})
+		}); err != nil {
+			j.logger.Error("Failed write JSON response", zap.Error(err))
+		}
 
 		return
 	}
 
-	c.JSON(http.StatusNoContent, gin.H{})
+	w.WriteHeader(http.StatusNoContent)
 }
