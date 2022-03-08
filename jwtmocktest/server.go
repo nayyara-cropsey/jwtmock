@@ -24,9 +24,8 @@ var (
 // A Server is an HTTP server listening on a system-chosen port on the
 // local loopback interface, for use in end-to-end HTTP tests.
 type Server struct {
-	URL string
+	*httptest.Server
 
-	server   *httptest.Server
 	keystore *service.KeyStore
 }
 
@@ -49,16 +48,9 @@ func NewServer() (*Server, error) {
 	server := httptest.NewServer(handler)
 
 	return &Server{
-		URL:      server.URL,
-		server:   server,
+		Server:   server,
 		keystore: keyStore,
 	}, nil
-}
-
-// Close shuts down the server and blocks until all outstanding
-// requests on this server have completed.
-func (s *Server) Close() {
-	s.server.Close()
 }
 
 // GenerateJWT generates a JWT token for use in authorization header.

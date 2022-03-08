@@ -3,6 +3,9 @@ DOCKER_IMAGE_TAG := jwt-mock:latest
 lint:
 	golangci-lint run ./...
 
+test:
+	go test ./... -v
+
 build:
 	go build ./
 

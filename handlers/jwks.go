@@ -3,7 +3,6 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/nayyara-cropsey/jwt-mock/service"
 	"go.uber.org/zap"
 )
 
@@ -12,12 +11,12 @@ const JWKSDefaultPath = "/.well-known/jwks.json"
 
 // JWKSHandler provides handlers for JWKS operations and stores state of the current JWKS.
 type JWKSHandler struct {
-	keyStore *service.KeyStore
+	keyStore keyStore
 	logger   *zap.Logger
 }
 
 // NewJWKSHandler is the preferred way to create a JWKSHandler instance.
-func NewJWKSHandler(keyStore *service.KeyStore, logger *zap.Logger) *JWKSHandler {
+func NewJWKSHandler(keyStore keyStore, logger *zap.Logger) *JWKSHandler {
 	return &JWKSHandler{
 		keyStore: keyStore,
 		logger:   logger,

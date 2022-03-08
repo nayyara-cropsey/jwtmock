@@ -69,13 +69,14 @@ func CreateToken(claims Claims, signingKey *types.SigningKey) (string, error) {
 		return "", fmt.Errorf("JWS headers key: %w", err)
 	}
 
-	options := []jwt.Option{jwt.WithHeaders(headers)}
+	token := jwt.New()
 	for k, v := range claims {
-		options = append(options, jwt.WithClaimValue(k, v))
+		if err := token.Set(k, v); err != nil {
+			return "", fmt.Errorf("set claim %v: %w", k, err)
+		}
 	}
 
-	token := jwt.New()
-	signedToken, err := jwt.Sign(token, signingKey.Algorithm, signingKey.Key, options...)
+	signedToken, err := jwt.Sign(token, signingKey.Algorithm, signingKey.Key, jwt.WithHeaders(headers))
 	if err != nil {
 		return "", fmt.Errorf("sign: %w", err)
 	}

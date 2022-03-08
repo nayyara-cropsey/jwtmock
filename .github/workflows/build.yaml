@@ -18,10 +18,12 @@ jobs:
         name: Setup Go
         with:
           go-version: '^1.16.1'
-      - name: Compile
-        run: make build
       - name: Go Lint
         uses: golangci/golangci-lint-action@v2
         with:
           version: v1.44
           only-new-issues: true
+      - name: Test
+        run: make test
+      - name: Compile
+        run: make build
