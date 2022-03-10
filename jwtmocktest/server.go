@@ -5,11 +5,11 @@ import (
 
 	"net/http/httptest"
 
-	"github.com/nayyara-cropsey/jwt-mock/handlers"
-	"github.com/nayyara-cropsey/jwt-mock/jwks"
-	"github.com/nayyara-cropsey/jwt-mock/jwt"
-	"github.com/nayyara-cropsey/jwt-mock/log"
-	"github.com/nayyara-cropsey/jwt-mock/service"
+	"github.com/nayyara-cropsey/jwtmock"
+	"github.com/nayyara-cropsey/jwtmock/internal/handlers"
+	"github.com/nayyara-cropsey/jwtmock/internal/jwks"
+	"github.com/nayyara-cropsey/jwtmock/internal/service"
+	"github.com/nayyara-cropsey/jwtmock/log"
 
 	"time"
 )
@@ -49,7 +49,7 @@ func NewServer() (*Server, error) {
 }
 
 // GenerateJWT generates a JWT token for use in authorization header.
-func (s *Server) GenerateJWT(claims jwt.Claims) (string, error) {
+func (s *Server) GenerateJWT(claims jwtmock.Claims) (string, error) {
 	signingKey := s.keystore.GetSigningKey()
-	return jwt.CreateToken(claims, signingKey)
+	return claims.CreateJWT(signingKey)
 }

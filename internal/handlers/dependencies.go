@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"github.com/lestrrat-go/jwx/jwk"
-	"github.com/nayyara-cropsey/jwt-mock/types"
+	"github.com/nayyara-cropsey/jwtmock"
 )
 
 type keyStore interface {
-	GetJWKS() *jwk.Set
 	GenerateNew() error
-	GetSigningKey() *types.SigningKey
+	GetJWKS() *jwk.Set
+	GetSigningKey() *jwtmock.SigningKey
 }

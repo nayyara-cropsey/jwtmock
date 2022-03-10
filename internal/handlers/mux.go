@@ -5,8 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/nayyara-cropsey/jwt-mock/log"
-	"github.com/nayyara-cropsey/jwt-mock/service"
+	"github.com/nayyara-cropsey/jwtmock/log"
 )
 
 // statusCapturingResponseWriter captures response status
@@ -36,7 +35,7 @@ func (r *requestLog) String() string {
 }
 
 // NewHandler the fully-wired HTTP handler with all routes registered.
-func NewHandler(keyStore *service.KeyStore, logger *log.Logger) http.Handler {
+func NewHandler(keyStore keyStore, logger *log.Logger) http.Handler {
 	mux := http.NewServeMux()
 
 	jwksHandler := NewJWKSHandler(keyStore, logger)

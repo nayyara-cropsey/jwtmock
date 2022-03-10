@@ -20,8 +20,8 @@ jobs:
         uses: ilteoood/docker_buildx@master
         with:
           publish: true
-          imageName: nayyarasamuel7/jwt-mock
-          dockerUser: nayyarasamuel7
+          imageName: nayyaracropsey/jwtmock
+          dockerUser: nayyaracropsey
           dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
           tag: ${{ steps.get_tag.outputs.TAG }},latest
           dockerFile: Dockerfile

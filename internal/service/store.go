@@ -4,15 +4,15 @@ import (
 	"sync"
 
 	"github.com/lestrrat-go/jwx/jwk"
-	"github.com/nayyara-cropsey/jwt-mock/jwks"
-	"github.com/nayyara-cropsey/jwt-mock/types"
+	"github.com/nayyara-cropsey/jwtmock"
+	"github.com/nayyara-cropsey/jwtmock/internal/jwks"
 )
 
 // KeyStore is used to keep state about current JWKS and signing key.
 type KeyStore struct {
 	generator *jwks.Generator
 
-	key    *types.SigningKey
+	key    *jwtmock.SigningKey
 	jwkSet *jwk.Set
 
 	m sync.Mutex
@@ -53,6 +53,6 @@ func (k *KeyStore) GetJWKS() *jwk.Set {
 }
 
 // GetSigningKey returns the currently stored signing key.
-func (k *KeyStore) GetSigningKey() *types.SigningKey {
+func (k *KeyStore) GetSigningKey() *jwtmock.SigningKey {
 	return k.key
 }

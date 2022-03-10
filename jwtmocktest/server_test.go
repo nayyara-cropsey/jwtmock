@@ -7,7 +7,7 @@ import (
 
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/lestrrat-go/jwx/jwt"
-	jm "github.com/nayyara-cropsey/jwt-mock/jwt"
+	"github.com/nayyara-cropsey/jwtmock"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +19,7 @@ func TestNewServer(t *testing.T) {
 
 	now := time.Now().Truncate(time.Second).UTC()
 	exp := now.Add(time.Hour)
-	token, err := server.GenerateJWT(jm.Claims{
+	token, err := server.GenerateJWT(jwtmock.Claims{
 		jwt.SubjectKey:    "olg387f",
 		jwt.IssuedAtKey:   now.Unix(),
 		jwt.ExpirationKey: exp.Unix(),

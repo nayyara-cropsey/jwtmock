@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/nayyara-cropsey/jwt-mock/jwt"
-	"github.com/nayyara-cropsey/jwt-mock/log"
+	"github.com/nayyara-cropsey/jwtmock"
+	"github.com/nayyara-cropsey/jwtmock/log"
 )
 
 type jwtResponse struct {
@@ -44,7 +44,7 @@ func (j *JWTHandler) RegisterDefaultPaths(api *http.ServeMux) {
 func (j *JWTHandler) Post(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var claims jwt.Claims
+	var claims jwtmock.Claims
 	if err := jsonUnmarshal(r, &claims); err != nil {
 		j.logger.Errorf("Failed to read claims: %v", err)
 
@@ -61,7 +61,7 @@ func (j *JWTHandler) Post(w http.ResponseWriter, r *http.Request) {
 	}
 
 	signingKey := j.keyStore.GetSigningKey()
-	token, err := jwt.CreateToken(claims, signingKey)
+	token, err := claims.CreateJWT(signingKey)
 	if err != nil {
 		j.logger.Errorf("Failed to generate JWT: %v", err)
 

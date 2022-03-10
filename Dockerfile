@@ -3,7 +3,7 @@ FROM golang:1.16 as builder
 ADD . /project
 WORKDIR /project/
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o jwt-mock .
+RUN CGO_ENABLED=0 GOOS=linux go build -o jwt-mock ./build/main.go
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates

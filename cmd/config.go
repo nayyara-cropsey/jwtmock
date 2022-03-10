@@ -1,4 +1,4 @@
-package types
+package cmd
 
 import (
 	"fmt"
@@ -38,8 +38,8 @@ func (c Config) String() string {
 	return fmt.Sprintf("port=%d key-length=%d cert-life=%v", c.Port, c.KeyLength, c.GetCertificateDuration())
 }
 
-// Load reads the given YAML file and loads config from it
-func Load(yamlFileName string) (*Config, error) {
+// LoadConfig reads the given YAML file and loads config from it
+func LoadConfig(yamlFileName string) (*Config, error) {
 	contents, err := os.ReadFile(yamlFileName)
 	if err != nil {
 		return nil, fmt.Errorf("read file: %w", err)
@@ -93,3 +93,5 @@ func getEnvVarStr(s string) (string, bool) {
 
 	return varStr, present
 }
+
+

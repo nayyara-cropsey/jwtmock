@@ -7,19 +7,25 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/nayyara-cropsey/jwt-mock/handlers"
-	"github.com/nayyara-cropsey/jwt-mock/jwks"
-	"github.com/nayyara-cropsey/jwt-mock/log"
-	"github.com/nayyara-cropsey/jwt-mock/service"
-	"github.com/nayyara-cropsey/jwt-mock/types"
+	"github.com/nayyara-cropsey/jwtmock/internal/handlers"
+	"github.com/nayyara-cropsey/jwtmock/internal/jwks"
+	"github.com/nayyara-cropsey/jwtmock/internal/service"
+	"github.com/nayyara-cropsey/jwtmock/log"
 )
 
 const (
-	// server is allowed this  much time to shutdown
+	// server is allowed this  much time to shut down
 	serverShutdownTimeout = time.Second * 5
 )
 
-func Execute(ctx context.Context, cfg *types.Config, logger *log.Logger) error {
+// Serve runs a command to start the server - uses provided context to shut down server when context is done.
+func Serve(ctx context.Context, configFile string) error {
+	cfg, err := LoadConfig(configFile)
+	if err != nil {
+		return fmt.Errorf("load config: %w", err)
+	}
+
+	logger := log.NewLogger(log.WithLevelStr(cfg.LogLevel))
 	logger.Infof("Config: %v", cfg)
 
 	certGenerator := service.NewCertificateGenerator(cfg.GetCertificateDuration())

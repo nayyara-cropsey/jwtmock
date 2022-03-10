@@ -1,10 +1,14 @@
 package jwks
 
 import (
+	// nolint:gosec //ignore warning about weak cryptographic primitive
+	"crypto/sha1"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 
 	"github.com/lestrrat-go/jwx/jwk"
-	"github.com/nayyara-cropsey/jwt-mock/types"
+	"github.com/nayyara-cropsey/jwtmock"
 )
 
 const signingUsage = "sig" // key is used for signing only
@@ -26,7 +30,7 @@ func NewGenerator(certGen certGenerator, keyGen keyGenerator, keyLen int) *Gener
 }
 
 // GenerateJWKSet generates a JSON web key set for use in signing tokens.
-func (t *Generator) GenerateJWKSet() (*jwk.Set, *types.SigningKey, error) {
+func (t *Generator) GenerateJWKSet() (*jwk.Set, *jwtmock.SigningKey, error) {
 	signingKey, err := t.keyGen.GenerateKey(t.keyLen)
 	if err != nil {
 		return nil, nil, fmt.Errorf("generate key: %w", err)
@@ -43,9 +47,32 @@ func (t *Generator) GenerateJWKSet() (*jwk.Set, *types.SigningKey, error) {
 	}
 
 	// generate JWK from signing key
-	key, err := signingKey.GenerateJWK(signingUsage, cert)
+	// generate JWK public key
+	key, err := jwk.New(signingKey.PublicKey)
 	if err != nil {
 		return nil, nil, fmt.Errorf("jwk: %w", err)
+	}
+
+	// encode cert as base-64 string
+	certStr := base64.StdEncoding.EncodeToString(cert.Raw)
+
+	// nolint:gosec // ignore weak cryptographic algorithm warning
+	hash := sha1.New()
+	hash.Write(cert.Raw)
+	x5tSHA1 := hex.EncodeToString(hash.Sum(nil))
+
+	vals := map[string]interface{}{
+		jwk.KeyIDKey:              signingKey.ID,
+		jwk.X509CertThumbprintKey: x5tSHA1,
+		jwk.X509CertChainKey:      []string{certStr},
+		jwk.KeyUsageKey:           signingUsage,
+		jwk.AlgorithmKey:          signingKey.Algorithm,
+	}
+
+	for k, v := range vals {
+		if err = key.Set(k, v); err != nil {
+			return nil, nil, fmt.Errorf("jwk field %v: %w", k, err)
+		}
 	}
 
 	keySet := &jwk.Set{Keys: []jwk.Key{key}}

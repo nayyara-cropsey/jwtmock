@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/lestrrat-go/jwx/jwa"
-	"github.com/nayyara-cropsey/jwt-mock/types"
+	"github.com/nayyara-cropsey/jwtmock"
 )
 
 // idLen is the ID length
@@ -27,14 +27,14 @@ func NewRSAKeyGenerator() *RSAKeyGenerator {
 }
 
 // GenerateKey generates a RSA signing key.
-func (k *RSAKeyGenerator) GenerateKey(length int) (*types.SigningKey, error) {
+func (k *RSAKeyGenerator) GenerateKey(length int) (*jwtmock.SigningKey, error) {
 	id := generateID(idLen)
 	key, err := rsa.GenerateKey(rand.Reader, length)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.SigningKey{
+	return &jwtmock.SigningKey{
 		ID:        id,
 		Key:       key,
 		Algorithm: jwa.RS256,

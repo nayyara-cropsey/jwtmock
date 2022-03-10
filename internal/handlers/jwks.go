@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/nayyara-cropsey/jwt-mock/log"
+	"github.com/nayyara-cropsey/jwtmock/log"
 )
 
 // JWKSDefaultPath is the default path for JWKS handlers.

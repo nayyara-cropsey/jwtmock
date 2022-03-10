@@ -6,11 +6,12 @@ lint:
 test:
 	go test ./... -v
 
+.PHONY: build
 build:
-	go build ./
+	go build -o jwt-mock ./build/main.go
 
 run:
-	go run main.go
+	go run build/main.go
 
 docker/build:
 	docker build . -t $(DOCKER_IMAGE_TAG)

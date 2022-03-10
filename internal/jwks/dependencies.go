@@ -3,7 +3,7 @@ package jwks
 import (
 	"crypto/x509"
 
-	"github.com/nayyara-cropsey/jwt-mock/types"
+	"github.com/nayyara-cropsey/jwtmock"
 )
 
 type certGenerator interface {
@@ -12,5 +12,5 @@ type certGenerator interface {
 }
 
 type keyGenerator interface {
-	GenerateKey(length int) (*types.SigningKey, error)
+	GenerateKey(length int) (*jwtmock.SigningKey, error)
 }

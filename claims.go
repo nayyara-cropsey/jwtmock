@@ -1,13 +1,13 @@
-package jwt
+package jwtmock
 
 import (
 	"errors"
 	"fmt"
 	"time"
 
+	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jws"
 	"github.com/lestrrat-go/jwx/jwt"
-	"github.com/nayyara-cropsey/jwt-mock/types"
 
 	"github.com/mitchellh/mapstructure"
 )
@@ -22,6 +22,14 @@ var (
 	// ErrSubMissing means the JWT token has missing subject
 	ErrSubMissing = errors.New("token subject is missing")
 )
+
+// SigningKey represents a generic key used to sign JWTs.
+type SigningKey struct {
+	ID        string
+	Key       interface{}
+	Algorithm jwa.SignatureAlgorithm
+	PublicKey interface{}
+}
 
 // Claims represents the type for JWT claims
 type Claims map[string]interface{}
@@ -58,9 +66,9 @@ func (c Claims) Valid() error {
 	return nil
 }
 
-// CreateToken generates a JWT token using the provided claims and signing key.
-func CreateToken(claims Claims, signingKey *types.SigningKey) (string, error) {
-	if err := claims.Valid(); err != nil {
+// CreateJWT generates a JWT token using the provided claims and signing key.
+func (c Claims) CreateJWT(signingKey *SigningKey) (string, error) {
+	if err := c.Valid(); err != nil {
 		return "", fmt.Errorf("validation: %w", err)
 	}
 
@@ -70,7 +78,7 @@ func CreateToken(claims Claims, signingKey *types.SigningKey) (string, error) {
 	}
 
 	token := jwt.New()
-	for k, v := range claims {
+	for k, v := range c {
 		if err := token.Set(k, v); err != nil {
 			return "", fmt.Errorf("set claim %v: %w", k, err)
 		}
