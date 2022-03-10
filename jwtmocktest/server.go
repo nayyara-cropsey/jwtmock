@@ -3,16 +3,15 @@ package jwtmocktest
 import (
 	"fmt"
 
+	"net/http/httptest"
+
 	"github.com/nayyara-cropsey/jwt-mock/handlers"
 	"github.com/nayyara-cropsey/jwt-mock/jwks"
 	"github.com/nayyara-cropsey/jwt-mock/jwt"
+	"github.com/nayyara-cropsey/jwt-mock/log"
 	"github.com/nayyara-cropsey/jwt-mock/service"
 
-	"net/http/httptest"
-
 	"time"
-
-	"go.uber.org/zap"
 )
 
 var (
@@ -39,11 +38,7 @@ func NewServer() (*Server, error) {
 		return nil, fmt.Errorf("init key store: %w", err)
 	}
 
-	logger, err := zap.NewDevelopment()
-	if err != nil {
-		return nil, fmt.Errorf("logger: %w", err)
-	}
-
+	logger := log.NewLogger(log.WithLevel(log.Debug))
 	handler := handlers.NewHandler(keyStore, logger)
 	server := httptest.NewServer(handler)
 

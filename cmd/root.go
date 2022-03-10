@@ -9,11 +9,10 @@ import (
 
 	"github.com/nayyara-cropsey/jwt-mock/handlers"
 	"github.com/nayyara-cropsey/jwt-mock/jwks"
+	"github.com/nayyara-cropsey/jwt-mock/log"
 	"github.com/nayyara-cropsey/jwt-mock/service"
 	"github.com/nayyara-cropsey/jwt-mock/types"
-
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
 )
 
 // ConfigKeyType is a special type for setting config key
@@ -42,19 +41,14 @@ var RootCmd = &cobra.Command{
 			return errors.New("invalid config type in context")
 		}
 
-		logger, err := zap.NewDevelopment()
-		if err != nil {
-			cmd.Println("Error creating logger", err)
-			return err
-		}
-
-		logger.Info("Config", zap.Stringer("config", config))
+		logger := log.NewLogger(log.WithLevel(log.Debug))
+		logger.Infof("Config: %v", config)
 
 		certGenerator := service.NewCertificateGenerator(config.GetCertificateDuration())
 		keyGenerator := jwks.NewGenerator(certGenerator, service.NewRSAKeyGenerator(), config.KeyLength)
 		keyStore, err := service.NewKeyStore(keyGenerator)
 		if err != nil {
-			logger.Error("Error while initializing key store", zap.Error(err))
+			logger.Errorf("Error while initializing key store: %v", err)
 			return err
 		}
 
@@ -73,7 +67,7 @@ var RootCmd = &cobra.Command{
 			if err := s.ListenAndServe(); err != nil {
 				// http.ErrServerClosed is expected after a successful server shutdown
 				if !errors.Is(err, http.ErrServerClosed) {
-					logger.Error("Error while shutting down server", zap.Error(err))
+					logger.Errorf("Error while shutting down server: %v", err)
 				}
 			}
 		}()
@@ -85,7 +79,7 @@ var RootCmd = &cobra.Command{
 		defer timeoutCancel()
 
 		if err := s.Shutdown(timeoutCtx); err != nil {
-			logger.Error("Error while shutting down server", zap.Error(err))
+			logger.Errorf("Error while shutting down server: %v", err)
 			return err
 		}
 

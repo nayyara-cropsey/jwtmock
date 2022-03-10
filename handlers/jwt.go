@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/nayyara-cropsey/jwt-mock/jwt"
-	"go.uber.org/zap"
+	"github.com/nayyara-cropsey/jwt-mock/log"
 )
 
 type jwtResponse struct {
@@ -17,11 +17,11 @@ const JWTDefaultPath = "/generate-jwt"
 // JWTHandler provides handlers for working with JWTs
 type JWTHandler struct {
 	keyStore keyStore
-	logger   *zap.Logger
+	logger   *log.Logger
 }
 
 // NewJWTHandler is the preferred way to create a JWTHandler instance.
-func NewJWTHandler(keyStore keyStore, logger *zap.Logger) *JWTHandler {
+func NewJWTHandler(keyStore keyStore, logger *log.Logger) *JWTHandler {
 	return &JWTHandler{
 		keyStore: keyStore,
 		logger:   logger,
@@ -46,7 +46,7 @@ func (j *JWTHandler) Post(w http.ResponseWriter, r *http.Request) {
 
 	var claims jwt.Claims
 	if err := jsonUnmarshal(r, &claims); err != nil {
-		j.logger.Error("failed to read claims", zap.Error(err))
+		j.logger.Errorf("Failed to read claims: %v", err)
 
 		w.WriteHeader(http.StatusBadRequest)
 
@@ -54,7 +54,7 @@ func (j *JWTHandler) Post(w http.ResponseWriter, r *http.Request) {
 			Message: "Failed to read claims",
 			Error:   err.Error(),
 		}); err != nil {
-			j.logger.Error("Failed write JSON response", zap.Error(err))
+			j.logger.Errorf("Failed write JSON response: %v", err)
 		}
 
 		return
@@ -63,7 +63,7 @@ func (j *JWTHandler) Post(w http.ResponseWriter, r *http.Request) {
 	signingKey := j.keyStore.GetSigningKey()
 	token, err := jwt.CreateToken(claims, signingKey)
 	if err != nil {
-		j.logger.Error("failed to generate JWT", zap.Error(err))
+		j.logger.Errorf("Failed to generate JWT: %v", err)
 
 		w.WriteHeader(http.StatusBadRequest)
 
@@ -71,14 +71,14 @@ func (j *JWTHandler) Post(w http.ResponseWriter, r *http.Request) {
 			Message: "Failed to generate JWT",
 			Error:   err.Error(),
 		}); err != nil {
-			j.logger.Error("Failed write JSON response", zap.Error(err))
+			j.logger.Errorf("Failed write JSON response: %v", err)
 		}
 
 		return
 	}
 
 	if err := jsonMarshal(w, jwtResponse{Token: token}); err != nil {
-		j.logger.Error("Failed write JSON response", zap.Error(err))
+		j.logger.Errorf("Failed write JSON response: %v", err)
 		return
 	}
 
