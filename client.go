@@ -16,7 +16,7 @@ type jwtResponse struct {
 type Client struct {
 	*http.Client
 
-	url string
+	URL string
 }
 
 // ClientOption allows setting options on the client
@@ -24,7 +24,7 @@ type ClientOption func(*Client)
 
 // NewClient creates a new client with the base URL and given options
 func NewClient(url string, options ...ClientOption) *Client {
-	c := &Client{url: url}
+	c := &Client{URL: url}
 	for _, option := range options {
 		option(c)
 	}
@@ -38,7 +38,7 @@ func NewClient(url string, options ...ClientOption) *Client {
 
 // GenerateJWT generates a JWT token for use in authorization header.
 func (c *Client) GenerateJWT(ctx context.Context, claims Claims) (string, error) {
-	url := fmt.Sprintf("%v/generate-jwt", c.url)
+	url := fmt.Sprintf("%v/generate-jwt", c.URL)
 
 	claimsJSON, err := json.Marshal(claims)
 	if err != nil {
@@ -47,7 +47,7 @@ func (c *Client) GenerateJWT(ctx context.Context, claims Claims) (string, error)
 		}
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, bytes.NewReader(claimsJSON))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(claimsJSON))
 	if err != nil {
 		return "", fmt.Errorf("create request: %w", err)
 	}
@@ -69,11 +69,6 @@ func (c *Client) GenerateJWT(ctx context.Context, claims Claims) (string, error)
 	}
 
 	return jwtResp.Token, nil
-}
-
-// URL is the base URL
-func (c *Client) URL() string {
-	return c.url
 }
 
 // WithHTTPClient option is used to set the http client
