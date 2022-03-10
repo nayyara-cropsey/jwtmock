@@ -4,8 +4,7 @@ go 1.16
 
 require (
 	github.com/lestrrat-go/jwx v1.0.3
-	github.com/mitchellh/mapstructure v1.4.3
-	github.com/spf13/cobra v1.3.0
-	github.com/spf13/viper v1.10.1
+	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/stretchr/testify v1.7.0
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

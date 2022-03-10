@@ -12,79 +12,56 @@ import (
 	"github.com/nayyara-cropsey/jwt-mock/log"
 	"github.com/nayyara-cropsey/jwt-mock/service"
 	"github.com/nayyara-cropsey/jwt-mock/types"
-	"github.com/spf13/cobra"
 )
 
-// ConfigKeyType is a special type for setting config key
-type ConfigKeyType string
-
 const (
-	// ConfigKey is the key for config set in the context for root command.
-	ConfigKey ConfigKeyType = "config"
-
 	// server is allowed this  much time to shutdown
 	serverShutdownTimeout = time.Second * 5
 )
 
-// RootCmd is the root command for this CLI.
-// It expects the command context to be set as follows:
-// (1) Context must provide config value via "config" key
-// (2) Context's Done() channel must be used to signal cancellation for this command to exit correctly.
-var RootCmd = &cobra.Command{
-	Use:   "jwt-mock",
-	Short: "JWT Mock is a server used to mock an authorization server in JWT-based authentication services.",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		configRaw := cmd.Context().Value(ConfigKey)
+func Execute(ctx context.Context, cfg *types.Config, logger *log.Logger) error {
+	logger.Infof("Config: %v", cfg)
 
-		config, ok := configRaw.(*types.Config)
-		if !ok {
-			return errors.New("invalid config type in context")
-		}
+	certGenerator := service.NewCertificateGenerator(cfg.GetCertificateDuration())
+	keyGenerator := jwks.NewGenerator(certGenerator, service.NewRSAKeyGenerator(), cfg.KeyLength)
+	keyStore, err := service.NewKeyStore(keyGenerator)
+	if err != nil {
+		logger.Errorf("Error while initializing key store: %v", err)
+		return err
+	}
 
-		logger := log.NewLogger(log.WithLevel(log.Debug))
-		logger.Infof("Config: %v", config)
+	mainHandler := handlers.NewHandler(keyStore, logger)
+	s := &http.Server{
+		Addr:    fmt.Sprintf(":%d", cfg.Port),
+		Handler: mainHandler,
 
-		certGenerator := service.NewCertificateGenerator(config.GetCertificateDuration())
-		keyGenerator := jwks.NewGenerator(certGenerator, service.NewRSAKeyGenerator(), config.KeyLength)
-		keyStore, err := service.NewKeyStore(keyGenerator)
-		if err != nil {
-			logger.Errorf("Error while initializing key store: %v", err)
-			return err
-		}
+		// add timeout to avoid long I/O waits
+		ReadTimeout:  time.Minute,
+		WriteTimeout: time.Minute,
+	}
 
-		mainHandler := handlers.NewHandler(keyStore, logger)
-		s := &http.Server{
-			Addr:    fmt.Sprintf(":%d", config.Port),
-			Handler: mainHandler,
-
-			// add timeout to avoid long I/O waits
-			ReadTimeout:  time.Minute,
-			WriteTimeout: time.Minute,
-		}
-
-		// start server
-		go func() {
-			if err := s.ListenAndServe(); err != nil {
-				// http.ErrServerClosed is expected after a successful server shutdown
-				if !errors.Is(err, http.ErrServerClosed) {
-					logger.Errorf("Error while shutting down server: %v", err)
-				}
+	// start server
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			// http.ErrServerClosed is expected after a successful server shutdown
+			if !errors.Is(err, http.ErrServerClosed) {
+				logger.Errorf("Error while shutting down server: %v", err)
 			}
-		}()
-
-		// handle cancellation and shutdown server with timeout before exiting
-		<-cmd.Context().Done()
-
-		timeoutCtx, timeoutCancel := context.WithTimeout(context.Background(), serverShutdownTimeout)
-		defer timeoutCancel()
-
-		if err := s.Shutdown(timeoutCtx); err != nil {
-			logger.Errorf("Error while shutting down server: %v", err)
-			return err
 		}
+	}()
 
-		logger.Info("Server shutdown complete")
+	// handle cancellation and shutdown server with timeout before exiting
+	<-ctx.Done()
 
-		return nil
-	},
+	timeoutCtx, timeoutCancel := context.WithTimeout(context.Background(), serverShutdownTimeout)
+	defer timeoutCancel()
+
+	if err := s.Shutdown(timeoutCtx); err != nil {
+		logger.Errorf("Error while shutting down server: %v", err)
+		return err
+	}
+
+	logger.Info("Server shutdown complete")
+
+	return nil
 }

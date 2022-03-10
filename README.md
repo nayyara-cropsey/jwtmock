@@ -28,7 +28,8 @@ The default config for this service is as follows:
 ```yaml
 port: 80
 key_length: 1024
-cert_life_days: 1 
+cert_life_days: 1
+log_level: debug
 ```
 
 You can override any of these through environment variables using the prefix `JWT_MOCK` . For example override port to
