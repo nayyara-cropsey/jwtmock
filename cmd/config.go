@@ -93,5 +93,3 @@ func getEnvVarStr(s string) (string, bool) {
 
 	return varStr, present
 }
-
-

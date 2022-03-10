@@ -69,6 +69,25 @@ req = req.WithHeader("Authorization", "Bearer: " + token)
 server.Close()
 ```
 
+Alternatively you can also use the `jwtmocktest.Client` to connect to a running JWT Mock server.
+
+```go 
+import (  
+  "github.com/nayyara-cropsey/jwtmock"
+)
+
+// create client 
+client, err := jwtmock.NewClient(mockJWTServerURL)
+
+// generate a JWT for use in Authorization header
+token, err := client.GenerateJWT(jwtmock.Claims{
+  "sub": "test-user",  // subject
+  "iat": 1646451994 // issued-at epoch time
+  "exp": 1646451994 // expiration epoch time 
+})
+
+```
+
 ## Docker
 
 This image is pushed to `nayyaracropsey/jwtmock` repository. Follow these steps to get it running:
