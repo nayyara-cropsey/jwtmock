@@ -3,7 +3,6 @@ module github.com/nayyara-cropsey/jwt-mock
 go 1.16
 
 require (
-	github.com/google/uuid v1.3.0
 	github.com/lestrrat-go/jwx v1.0.3
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/spf13/cobra v1.3.0
