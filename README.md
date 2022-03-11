@@ -32,8 +32,9 @@ Follow these 3 simple steps to use JWT Mock in your tests:
 
 ## API Documentation
 
-The JWT Mock API is documented using Open API/Swagger [here](./docs/oas.yaml). Be sure to reference it for any questions
-about the API endpoints.
+The JWT Mock API is documented using Open API and available on
+SwaggerHub [here](https://app.swaggerhub.com/apis-docs/nayyara-cropsey/jwtmock/1.0.0/). Be sure to reference it for
+any questions about the API endpoints.
 
 You will also find helpful examples using `curl` [here](./docs/curl_example.md).
 

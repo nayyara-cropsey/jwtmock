@@ -1,23 +1,23 @@
 openapi: 3.0.1
 info:
   title: JWT Mock API
-  description: JWT Mock is an API that is used in tests to mock out an OAuth authorization server.
+  description: >-
+    JWT Mock is an API that is used in tests to mock out an OAuth authorization
+    server.
   version: 1.0.0
-
 tags:
-- name: JWKS
-  description: JSON Web Token Keyset
-- name: JWT
-  description: JSON Web Token
-
+  - name: JWKS
+    description: JSON Web Token Keyset
+  - name: JWT
+    description: JSON Web Token
 paths:
   /.well-known/jwks.json:
     get:
       tags:
-      - JWKS
+        - JWKS
       summary: Returns JSON Web Keyset used to sign JWTs
       responses:
-        200:
+        '200':
           description: Success
           content:
             application/json:
@@ -25,13 +25,13 @@ paths:
                 $ref: '#/components/schemas/jwkset'
     post:
       tags:
-      - JWKS
+        - JWKS
       summary: Forces the current JWKS to be rotated and replaced with a new one
       responses:
-        201:
+        '201':
           description: Success
           content: {}
-        500:
+        '500':
           description: Internal Error
           content:
             application/json:
@@ -40,9 +40,11 @@ paths:
   /generate-jwt:
     post:
       tags:
-      - JWT
+        - JWT
       summary: Generates a JWT with the claims posted in the body.
-      description: Certain claims are required such as sub (subject        at) and exp (expires at).
+      description: >-
+        Certain claims are required such as sub (subject        at) and exp
+        (expires at).
       requestBody:
         description: information about the organization being created
         content:
@@ -51,19 +53,19 @@ paths:
               $ref: '#/components/schemas/claims'
         required: false
       responses:
-        200:
+        '200':
           description: Successfully created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/jwt'
-        400:
+        '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
-        500:
+        '500':
           description: Internal Error
           content:
             application/json:
@@ -84,32 +86,41 @@ components:
           example: AQAB
         kid:
           type: string
-          description: The key ID parameter is used to match a specific key.  This
-            is used, for instance, to choose among a set of keys within a JWK Set
-            during key rollover
+          description: >-
+            The key ID parameter is used to match a specific key.  This is used,
+            for instance, to choose among a set of keys within a JWK Set during
+            key rollover
           example: cc822394-82c9-11ec-abae-3e22fbc2e3ae
         kty:
           type: string
-          description: Key type parameter identifies the cryptographic algorithm family
+          description: >-
+            Key type parameter identifies the cryptographic algorithm family
             used with the key, such as RSA or EC.
           example: RSA
-        n:
+        'n':
           type: string
-          example: 33rLP5iOuTfs4bQKG0EotG8C003FatBgjlTsoR5FfIoGbROf-g0I_-8QLcCA9StFbu1l63cyd-zgcM-E9x1HfqxR99xLVxKQqZR9Q-zyHk-IJoFGo-XWp4GiK_cV9CD3z70wX6ySLSTvcbRXRILSJEVvGntPkB5AQwJ-pusPus8
+          example: >-
+            33rLP5iOuTfs4bQKG0EotG8C003FatBgjlTsoR5FfIoGbROf-g0I_-8QLcCA9StFbu1l63cyd-zgcM-E9x1HfqxR99xLVxKQqZR9Q-zyHk-IJoFGo-XWp4GiK_cV9CD3z70wX6ySLSTvcbRXRILSJEVvGntPkB5AQwJ-pusPus8
         use:
           type: string
-          description: Identifies the intended use of the public key. Can be sig (signature)
-            or enc (encryption)
+          description: >-
+            Identifies the intended use of the public key. Can be sig
+            (signature) or enc (encryption)
           example: sig
         x5c:
           type: array
-          description: X.509 Certificate Chain – chain of certificates used for verification.
+          description: >-
+            X.509 Certificate Chain – chain of certificates used for
+            verification.
           items:
             type: string
-            example: MIIB0TCCATqgAwIBAgIBJzANBgkqhkiG9w0BAQsFADATMREwDwYDVQQKEwhKV1QgTW9jazAeFw0yMjAxMzExOTEyNTdaFw0yMjAyMDExOTEyNTdaMBMxETAPBgNVBAoTCEpXVCBNb2NrMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDfess/mI65N+zhtAobQSi0bwLTTcVq0GCOVOyhHkV8igZtE5/6DQj/7xAtwID1K0Vu7WXrdzJ37OBwz4T3HUd+rFH33EtXEpCplH1D7PIeT4gmgUaj5dangaIr9xX0IPfPvTBfrJItJO9xtFdEgtIkRW8ae0+QHkBDAn6m6w+6zwIDAQABozUwMzAOBgNVHQ8BAf8EBAMCBaAwEwYDVR0lBAwwCgYIKwYBBQUHAwEwDAYDVR0TAQH/BAIwADANBgkqhkiG9w0BAQsFAAOBgQDVqaUj95gimKeWaxGQX3nSPs3zkM1cll6igQRA57T1PXOdY+LD+tlWQDJnKHYTGxCjSdNwqujPimrz6C2I+T3sB7W1M3zEsOUv/gYiBMK/2IyJlo93WaY8U31sAztxUb47g4+YqVeaX4lg2SRala4/cVyjN0QU9AgwbvYGwFdTWg==
+            example: >-
+              MIIB0TCCATqgAwIBAgIBJzANBgkqhkiG9w0BAQsFADATMREwDwYDVQQKEwhKV1QgTW9jazAeFw0yMjAxMzExOTEyNTdaFw0yMjAyMDExOTEyNTdaMBMxETAPBgNVBAoTCEpXVCBNb2NrMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDfess/mI65N+zhtAobQSi0bwLTTcVq0GCOVOyhHkV8igZtE5/6DQj/7xAtwID1K0Vu7WXrdzJ37OBwz4T3HUd+rFH33EtXEpCplH1D7PIeT4gmgUaj5dangaIr9xX0IPfPvTBfrJItJO9xtFdEgtIkRW8ae0+QHkBDAn6m6w+6zwIDAQABozUwMzAOBgNVHQ8BAf8EBAMCBaAwEwYDVR0lBAwwCgYIKwYBBQUHAwEwDAYDVR0TAQH/BAIwADANBgkqhkiG9w0BAQsFAAOBgQDVqaUj95gimKeWaxGQX3nSPs3zkM1cll6igQRA57T1PXOdY+LD+tlWQDJnKHYTGxCjSdNwqujPimrz6C2I+T3sB7W1M3zEsOUv/gYiBMK/2IyJlo93WaY8U31sAztxUb47g4+YqVeaX4lg2SRala4/cVyjN0QU9AgwbvYGwFdTWg==
         x5kt:
           type: string
-          description: X.509 Certificate Thumbprint – Used to identify specific certificates
+          description: >-
+            X.509 Certificate Thumbprint – Used to identify specific
+            certificates
           example: 1o2uPYGVDaxWfwvg9GewbbChrjk
     jwkset:
       type: object
@@ -123,19 +134,20 @@ components:
       type: object
       description: Claims to sign with the JWT
       example:
-        sub: nayyara.samuel
+        sub: nayyara.cropsey
         iat: 1643651018
         exp: 1643748940
         scope: openid profile offline_access
         aud:
-        - https://api.mine.go
+          - https://api.mine.go
     jwt:
       type: object
       properties:
         token:
           type: string
           description: JWT token generated from current signing key
-          example: eyJhbGciOiJSUzI1NiIsImtpZCI6IjFmMmNmZWI2LTgzOGQtMTFlYy04YTU2LTNlMjJmYmMyZTNhZSIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiaHR0cHM6Ly9hcGkubWluZS5nbyJdLCJleHAiOjE2NDM3NDg5NDAsImlhdCI6MTY0MzY1MTAxOCwiaXNzIjoiaHR0cHM6Ly9hdXRoLm1pbmUuZ28vIiwic3ViIjoibmF5eWFyYSJ9.Gn6mFz742gvQdNSTR1eUKgFHdGlbnt-xbJQzY6B2m9OS1o7TJNbIRJ9B6dvhztalmOMyQas_b20QWxTjGzjzLTf8TuHonBX3AMhaV-nORa-KLyWhJVixxoZfktS2NrgaErk_T5TI8-Gdv45GJ_V_w1Mlijj62chKX0s6Omq2-Ck
+          example: >-
+            eyJhbGciOiJSUzI1NiIsImtpZCI6IjFmMmNmZWI2LTgzOGQtMTFlYy04YTU2LTNlMjJmYmMyZTNhZSIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiaHR0cHM6Ly9hcGkubWluZS5nbyJdLCJleHAiOjE2NDM3NDg5NDAsImlhdCI6MTY0MzY1MTAxOCwiaXNzIjoiaHR0cHM6Ly9hdXRoLm1pbmUuZ28vIiwic3ViIjoibmF5eWFyYSJ9.Gn6mFz742gvQdNSTR1eUKgFHdGlbnt-xbJQzY6B2m9OS1o7TJNbIRJ9B6dvhztalmOMyQas_b20QWxTjGzjzLTf8TuHonBX3AMhaV-nORa-KLyWhJVixxoZfktS2NrgaErk_T5TI8-Gdv45GJ_V_w1Mlijj62chKX0s6Omq2-Ck
     error:
       type: object
       properties:
