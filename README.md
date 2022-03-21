@@ -4,14 +4,17 @@
 
 # JWT Mock
 
-JWT Mock is a web server that is used to mock out a JWT-based authorization server for an authenticated API. Mocking out
-an authorization service is especially helpful in end-to-end/smoke testing to see how different handlers and middleware
-respond to JWTs representing various levels of access and identities.
+JWT Mock is a web server that is used to mock out a JWT-based authorization server for protected API. The protected API typically requires a JWT header in requests which is then validated by verifying the signture of the JWT. The authorization server provides a JWKS (JSON Web Key Set) which is consumed by the API for JWT verification. 
+
+![protected-api](docs/jwt-consumer.png)
+
+Mocking out an authorization server is especially helpful in end-to-end/smoke testing to see how different handlers and middleware respond to JWTs representing various levels of access and identities.
 
 Mock JWTs can help you cover various testing scenarios.
 
 * Create tokens for various user identities.
 * Create tokens with various scopes/permissions for testing access control.
+
 
 ## Quick Start
 
@@ -22,8 +25,7 @@ Follow these 3 simple steps to use JWT Mock in your tests:
 * Via Docker image if using a docker ecosystem
 * Via `jwtmocktest.NewServer` in Go tests
 
-2) Configure a dependent API on to use JWT Mock server as the authorization server. The server provides an endpoint to
-   retrieves the JSON Web Key Set (JWKS) at `./well-known/jwks.json`
+2) Configure the API under test to use JWT Mock server as the authorization server. The server provides an endpoint to retrieves the JSON Web Key Set (JWKS) at `./well-known/jwks.json`
 
 3) Generate JWTs for use in tests
 
@@ -118,3 +120,24 @@ using:
 ```bash 
 docker run -p 80:80 --env JWT_MOCK_KEY_LENGTH=2048 --env nayyaracropsey/jwtmock:latest
 ```
+
+## Client Credentials
+
+An API under test might also be a consumer of another service and might use machine-to-machine workflow to access another service. Sometimes the request to obtain a client's JWT is coded into the microservice and must be fulfilled by some mocked service. JWT Mock can be used in such a workflow as well to allow credentials to be obtained. 
+
+![client](docs/jwt-client.png)
+
+NOTE: During tests the external service will likely be mocked out and how that is handled is outside the scope of the usefulness of JWT Mock.
+
+To use JWT mock in this workflow
+
+1) Start JWT Mock server
+
+* Via Docker image if using a docker ecosystem
+* Via `jwtmocktest.NewServer` in Go tests
+
+2) Configure the API under test to use JWT Mock server as the authorization server. 
+
+3) Register a client with the mock server to whitelist accepted clients. The server provides an endpoint to register clients at `POST /clients`.
+
+4) Internal calls to obtain client JWTs will now work as expected - JWT Mock expects such calls to use the endpoint `/oauth/token` with `grant_type=client_credentials`. 
