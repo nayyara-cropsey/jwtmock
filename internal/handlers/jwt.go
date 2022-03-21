@@ -12,7 +12,7 @@ type jwtResponse struct {
 }
 
 // JWTDefaultPath is the default path for JWT handlers.
-const JWTDefaultPath = "/generate-jwt"
+const JWTDefaultPath = "/jwtmock/generate-jwt"
 
 // JWTHandler provides handlers for working with JWTs
 type JWTHandler struct {

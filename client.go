@@ -71,6 +71,41 @@ func (c *Client) GenerateJWT(ctx context.Context, claims Claims) (string, error)
 	return jwtResp.Token, nil
 }
 
+// RegisterClient register a new client
+func (c *Client) RegisterClient(ctx context.Context, registration ClientRegistration) (string, error) {
+	url := fmt.Sprintf("%v/clients", c.URL)
+
+	claimsJSON, err := json.Marshal(registration)
+	if err != nil {
+		if err != nil {
+			return "", fmt.Errorf("client registration JSON: %w", err)
+		}
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(claimsJSON))
+	if err != nil {
+		return "", fmt.Errorf("create request: %w", err)
+	}
+
+	resp, err := c.Client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("http: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusAccepted {
+		return "", fmt.Errorf("got HTTP status: %v", resp.StatusCode)
+	}
+
+	var jwtResp jwtResponse
+	if err := json.NewDecoder(resp.Body).Decode(&jwtResp); err != nil {
+		return "", fmt.Errorf("parse: %w", err)
+	}
+
+	return jwtResp.Token, nil
+}
+
 // WithHTTPClient option is used to set the http client
 func WithHTTPClient(hc *http.Client) ClientOption {
 	return func(c *Client) {

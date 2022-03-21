@@ -9,7 +9,7 @@ import (
 
 const (
 	// ClientsDefaultPath is the default path for ClientsHandler handlers.
-	ClientsDefaultPath = "/clients"
+	ClientsDefaultPath = "/jwtmock/clients"
 
 	// ClientDefaultTokenPath is the path for authenticating clients
 	// nolint:gosec // ignore irrelevant warning

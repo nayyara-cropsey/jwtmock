@@ -25,7 +25,8 @@ var (
 type Server struct {
 	*httptest.Server
 
-	keystore *service.KeyStore
+	keystore    *service.KeyStore
+	clientsRepo *service.ClientRepo
 }
 
 // NewServer starts and returns a new Server.
@@ -44,8 +45,9 @@ func NewServer() (*Server, error) {
 	server := httptest.NewServer(handler)
 
 	return &Server{
-		Server:   server,
-		keystore: keyStore,
+		Server:      server,
+		keystore:    keyStore,
+		clientsRepo: clientRepo,
 	}, nil
 }
 
@@ -53,4 +55,9 @@ func NewServer() (*Server, error) {
 func (s *Server) GenerateJWT(claims jwtmock.Claims) (string, error) {
 	signingKey := s.keystore.GetSigningKey()
 	return claims.CreateJWT(signingKey)
+}
+
+// RegisterClient registers a new client for subsequent token request.
+func (s *Server) RegisterClient(registration jwtmock.ClientRegistration) error {
+	return s.clientsRepo.Register(registration)
 }
