@@ -73,6 +73,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
+  /clients:
+    post:
+      tags:
+        - Client
+      summary: Register a new client for machine-to-machine workflows
+      description: Register a new client with a predefined scope
+      requestBody:
+        description: Client request
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/clientRegistration'
+        required: false
+      responses:
+        '202':
+          description: Successfully created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'  
   /oauth/token:
     post:
       tags:
@@ -95,34 +123,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/clientTokenResponse'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '500':
-          description: Internal Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'                
-  /clients:
-    post:
-      tags:
-        - Client
-      summary: Register a new client for machine-to-machine workflows
-      description: Register a new client with a predefined scope
-      requestBody:
-        description: Client request
-        content:
-          'application/json':
-            schema:
-              $ref: '#/components/schemas/clientRegistration'
-        required: false
-      responses:
-        '202':
-          description: Successfully created
         '400':
           description: Bad Request
           content:
