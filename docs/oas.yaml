@@ -4,12 +4,14 @@ info:
   description: >-
     JWT Mock is an API that is used in tests to mock out an OAuth authorization
     server.
-  version: 1.0.0
+  version: 1.1.0
 tags:
   - name: JWKS
     description: JSON Web Token Keyset
   - name: JWT
     description: JSON Web Token
+  - name: Client
+    description: OAuth machine-to-machine clients
 paths:
   /.well-known/jwks.json:
     get:
@@ -43,12 +45,12 @@ paths:
         - JWT
       summary: Generates a JWT with the claims posted in the body.
       description: >-
-        Certain claims are required such as sub (subject        at) and exp
+        Certain claims are required such as sub (subject) and exp
         (expires at).
       requestBody:
-        description: information about the organization being created
+        description: Claims to include in JWT
         content:
-          '*/*':
+          'application/json':
             schema:
               $ref: '#/components/schemas/claims'
         required: false
@@ -71,7 +73,69 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
-      x-codegen-request-body-name: request body
+  /oauth/token:
+    post:
+      tags:
+        - JWT
+        - Client
+      summary: Generates a token for a client using the requested grant type
+      description: >-
+       Generate a token for a client using existing credentails. The client must be registered prior to this call.
+      requestBody:
+        description: Client request
+        content:
+          'application/x-www-form-urlencoded':
+            schema:
+              $ref: '#/components/schemas/clientTokenRequest'
+        required: false
+      responses:
+        '200':
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/clientTokenResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'                
+  /clients:
+    post:
+      tags:
+        - Client
+      summary: Register a new client for machine-to-machine workflows
+      description: Register a new client with a predefined scope
+      requestBody:
+        description: Client request
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/clientRegistration'
+        required: false
+      responses:
+        '202':
+          description: Successfully created
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'                
+
 components:
   schemas:
     jwk:
@@ -148,6 +212,59 @@ components:
           description: JWT token generated from current signing key
           example: >-
             eyJhbGciOiJSUzI1NiIsImtpZCI6IjFmMmNmZWI2LTgzOGQtMTFlYy04YTU2LTNlMjJmYmMyZTNhZSIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiaHR0cHM6Ly9hcGkubWluZS5nbyJdLCJleHAiOjE2NDM3NDg5NDAsImlhdCI6MTY0MzY1MTAxOCwiaXNzIjoiaHR0cHM6Ly9hdXRoLm1pbmUuZ28vIiwic3ViIjoibmF5eWFyYSJ9.Gn6mFz742gvQdNSTR1eUKgFHdGlbnt-xbJQzY6B2m9OS1o7TJNbIRJ9B6dvhztalmOMyQas_b20QWxTjGzjzLTf8TuHonBX3AMhaV-nORa-KLyWhJVixxoZfktS2NrgaErk_T5TI8-Gdv45GJ_V_w1Mlijj62chKX0s6Omq2-Ck
+    clientTokenRequest:
+      type: object
+      properties:
+        client_id:
+          type: string 
+          description: ID of the client
+          example: lq30r49f97sauf
+        client_secret:
+          type: string
+          description: Secret of the client
+          example: 9237rofj~dsafj
+        audience: 
+          type: string
+          description: Audience for the generated JWT
+          example: "https://target.api"
+        grant_type:
+          type: string
+          description: Grant type - only `client_credentials` supported currently
+          example: "client_credentials"
+    clientTokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string 
+          description: JWT generated for client
+          example: >-
+            eyJhbGciOiJSUzI1NiIsImtpZCI6IkRNSEpNTGFJQWdpMmRVVTYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOlsidGVzdCJdLCJleHAiOjE2NDc4OTM2OTIsImlhdCI6MTY0Nzg5MDA5MiwiaXNzIjoiaHR0cHM6Ly9qd3Rtb2NrLmNvIiwic3ViIjoiMm8zOTQ3dzlmN3M5YWZAY2xpZW50cyIsImF6cCI6IjJvMzk0N3c5ZjdzOWFmIiwiZ3R5IjoiY2xpZW50X2NyZWRlbnRpYWxzIiwic2NvcGUiOiJ1c2VyczpyZWFkIn0.oQZCfXaLCgfymnLB8-Xb6ujJckCL59ot2mCJ5GkjaRXr5UQFtncHJfr9obcPMx9Q7_2TeMp57cicYhmarXMDgAIEHu-rSuL988WiogSm67UojFuVlmp2j1Ne0ZZA5mEjmhkUMOihlCHNtIgCEpmjTtZvcHz-PHwfoID2r3_U3K4
+        scope: 
+          type: string
+          description: Scope for client
+          example: "users:read"
+        expires_in:
+          type: integer
+          description: When the token expires
+          example: 1647893692
+        token_type: 
+          type: string
+          example: Bearer     
+    clientRegistration: 
+      type: object
+      properties:
+        client_id:
+          type: string 
+          description: ID of the client
+          example: lq30r49f97sauf
+        client_secret:
+          type: string
+          description: Secret of the client
+          example: 9237rofj~dsafj
+        scope:
+          type: string
+          description: Scope that this client is restricted to
+          example: "users:read"
     error:
       type: object
       properties:
@@ -160,3 +277,7 @@ components:
       example:
         message: Failed to validate claims
         example: token has expired
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/nayyara-cropsey/jwtmock/1.1.0
