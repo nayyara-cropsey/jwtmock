@@ -35,7 +35,7 @@ Follow these 3 simple steps to use JWT Mock in your tests:
 ## API Documentation
 
 The JWT Mock API is documented using Open API and available on
-SwaggerHub [here](https://app.swaggerhub.com/apis-docs/nayyara-cropsey/jwtmock/1.1.0/). Be sure to reference it for
+SwaggerHub [here](https://app.swaggerhub.com/apis-docs/nayyara-cropsey/jwtmock/1.1.1/). Be sure to reference it for
 any questions about the API endpoints.
 
 You will also find helpful examples using `curl` [here](./docs/curl_example.md).
@@ -124,6 +124,7 @@ docker run -p 80:80 --env JWT_MOCK_KEY_LENGTH=2048 --env nayyaracropsey/jwtmock:
 ## Client Credentials
 
 An API under test might also be a consumer of another service and might use machine-to-machine workflow to access another service. Sometimes the request to obtain a client's JWT is coded into the microservice and must be fulfilled by some service during end-to-end testing. 
+
 ![client](docs/jwt-client.png)
 
 JWT Mock can be used in such a workflow as well to allow credentials to be obtained. JWT Mock requires a client to be registered in anticipation for such a call to succeed. It provides the `POST /jwtmock/clients` endpoint. 
@@ -139,7 +140,7 @@ To use JWT mock in this workflow
 
 2) Configure the API under test to use JWT Mock server as the authorization server. 
 
-3) Register a client with the mock server to whitelist accepted clients. The server provides an endpoint to register clients at `POST /clients`. For Go code, both `jwttestmock.Server` and `jwtmock.Client` have a `RegisterClient()` method to allow client registration.
+3) Register a client with the mock server to whitelist accepted clients. The server provides an endpoint to register clients at `POST /jwtmock/clients`. For Go code, both `jwttestmock.Server` and `jwtmock.Client` have a `RegisterClient()` method to allow client registration.
 
 4) Internal calls to obtain client JWTs will now work as expected - JWT Mock expects such calls to use the endpoint `/oauth/token` with `grant_type=client_credentials`. 
 

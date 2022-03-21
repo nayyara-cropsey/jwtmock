@@ -38,72 +38,22 @@ func NewClient(url string, options ...ClientOption) *Client {
 
 // GenerateJWT generates a JWT token for use in authorization header.
 func (c *Client) GenerateJWT(ctx context.Context, claims Claims) (string, error) {
-	url := fmt.Sprintf("%v/generate-jwt", c.URL)
-
-	claimsJSON, err := json.Marshal(claims)
-	if err != nil {
-		if err != nil {
-			return "", fmt.Errorf("claims JSON: %w", err)
-		}
-	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(claimsJSON))
-	if err != nil {
-		return "", fmt.Errorf("create request: %w", err)
-	}
-
-	resp, err := c.Client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("http: %w", err)
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("got HTTP status: %v", resp.StatusCode)
-	}
+	url := fmt.Sprintf("%v/jwtmock/generate-jwt", c.URL)
 
 	var jwtResp jwtResponse
-	if err := json.NewDecoder(resp.Body).Decode(&jwtResp); err != nil {
-		return "", fmt.Errorf("parse: %w", err)
+	err := c.jsonRequest(ctx, url, claims, http.StatusOK, &jwtResp)
+	if err != nil {
+		return "", err
 	}
 
 	return jwtResp.Token, nil
 }
 
 // RegisterClient register a new client
-func (c *Client) RegisterClient(ctx context.Context, registration ClientRegistration) (string, error) {
-	url := fmt.Sprintf("%v/clients", c.URL)
+func (c *Client) RegisterClient(ctx context.Context, registration ClientRegistration) error {
+	url := fmt.Sprintf("%v/jwtmock/clients", c.URL)
 
-	claimsJSON, err := json.Marshal(registration)
-	if err != nil {
-		if err != nil {
-			return "", fmt.Errorf("client registration JSON: %w", err)
-		}
-	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(claimsJSON))
-	if err != nil {
-		return "", fmt.Errorf("create request: %w", err)
-	}
-
-	resp, err := c.Client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("http: %w", err)
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusAccepted {
-		return "", fmt.Errorf("got HTTP status: %v", resp.StatusCode)
-	}
-
-	var jwtResp jwtResponse
-	if err := json.NewDecoder(resp.Body).Decode(&jwtResp); err != nil {
-		return "", fmt.Errorf("parse: %w", err)
-	}
-
-	return jwtResp.Token, nil
+	return c.jsonRequest(ctx, url, registration, http.StatusAccepted, nil)
 }
 
 // WithHTTPClient option is used to set the http client
@@ -111,4 +61,41 @@ func WithHTTPClient(hc *http.Client) ClientOption {
 	return func(c *Client) {
 		c.Client = hc
 	}
+}
+
+// jsonRequest sends a JSON request with expected status and an instance for populating response
+func (c *Client) jsonRequest(ctx context.Context, url string, reqBody interface{},
+	expectedStatus int, response interface{}) error {
+	claimsJSON, err := json.Marshal(reqBody)
+	if err != nil {
+		if err != nil {
+			return fmt.Errorf("marshal JSON: %w", err)
+		}
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(claimsJSON))
+	if err != nil {
+		return fmt.Errorf("create reqBody: %w", err)
+	}
+
+	resp, err := c.Client.Do(req)
+	if err != nil {
+		return fmt.Errorf("http do: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != expectedStatus {
+		return fmt.Errorf("got HTTP status: %v", resp.StatusCode)
+	}
+
+	if response == nil {
+		return nil
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return fmt.Errorf("unmarshal JSON: %w", err)
+	}
+
+	return nil
 }
