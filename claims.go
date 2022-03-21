@@ -34,6 +34,14 @@ type SigningKey struct {
 // Claims represents the type for JWT claims
 type Claims map[string]interface{}
 
+// ClaimsFrom generates a claims object form the given struct
+func ClaimsFrom(v interface{}) (Claims, error) {
+	var claims Claims
+
+	err := mapstructure.Decode(v, &claims)
+	return claims, err
+}
+
 // internal type for validating require fields.
 type requiredClaims struct {
 	Subject   string `mapstructure:"sub"`

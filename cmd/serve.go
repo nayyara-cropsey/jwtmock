@@ -36,7 +36,9 @@ func Serve(ctx context.Context, configFile string) error {
 		return err
 	}
 
-	mainHandler := handlers.NewHandler(keyStore, logger)
+	clientRepo := service.NewClientRepo()
+	mainHandler := handlers.NewHandler(keyStore, clientRepo, logger)
+
 	s := &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Port),
 		Handler: mainHandler,

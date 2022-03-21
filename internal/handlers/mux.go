@@ -35,7 +35,7 @@ func (r *requestLog) String() string {
 }
 
 // NewHandler the fully-wired HTTP handler with all routes registered.
-func NewHandler(keyStore keyStore, logger *log.Logger) http.Handler {
+func NewHandler(keyStore keyStore, clientRepo clientRepo, logger *log.Logger) http.Handler {
 	mux := http.NewServeMux()
 
 	jwksHandler := NewJWKSHandler(keyStore, logger)
@@ -43,6 +43,9 @@ func NewHandler(keyStore keyStore, logger *log.Logger) http.Handler {
 
 	jwtHandler := NewJWTHandler(keyStore, logger)
 	jwtHandler.RegisterDefaultPaths(mux)
+
+	clientsHandler := NewClientsHandler(keyStore, clientRepo, logger)
+	clientsHandler.RegisterDefaultPaths(mux)
 
 	// wrap mux with a handler that logs requests
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

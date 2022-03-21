@@ -24,13 +24,13 @@ func NewJWKSHandler(keyStore keyStore, logger *log.Logger) *JWKSHandler {
 }
 
 // RegisterDefaultPaths registers the default paths for JWKS operations.
-func (j *JWKSHandler) RegisterDefaultPaths(api *http.ServeMux) {
+func (h *JWKSHandler) RegisterDefaultPaths(api *http.ServeMux) {
 	api.HandleFunc(JWKSDefaultPath, func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			j.Get(w, r)
+			h.Get(w, r)
 		case http.MethodPost:
-			j.Post(w, r)
+			h.Post(w, r)
 		default:
 			notFoundResponse(w)
 		}
@@ -38,21 +38,21 @@ func (j *JWKSHandler) RegisterDefaultPaths(api *http.ServeMux) {
 }
 
 // Get returns a JSON web key set for the authorization server.
-func (j *JWKSHandler) Get(w http.ResponseWriter, _ *http.Request) {
+func (h *JWKSHandler) Get(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	if err := jsonMarshal(w, j.keyStore.GetJWKS()); err != nil {
-		j.logger.Errorf("Failed write JSON response: %v", err)
+	if err := jsonMarshal(w, h.keyStore.GetJWKS()); err != nil {
+		h.logger.Errorf("Failed write JSON response: %v", err)
 		return
 	}
 }
 
 // Post forces a new JSON web key set to be created / the key set to be refreshed.
-func (j *JWKSHandler) Post(w http.ResponseWriter, _ *http.Request) {
+func (h *JWKSHandler) Post(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	if err := j.keyStore.GenerateNew(); err != nil {
-		j.logger.Errorf("Failed to generate new key set: %v", err)
+	if err := h.keyStore.GenerateNew(); err != nil {
+		h.logger.Errorf("Failed to generate new key set: %v", err)
 
 		w.WriteHeader(http.StatusInternalServerError)
 
@@ -60,7 +60,7 @@ func (j *JWKSHandler) Post(w http.ResponseWriter, _ *http.Request) {
 			Message: "Failed to refresh JWK set",
 			Error:   err.Error(),
 		}); err != nil {
-			j.logger.Errorf("Failed write JSON response: %v", err)
+			h.logger.Errorf("Failed write JSON response: %v", err)
 		}
 
 		return

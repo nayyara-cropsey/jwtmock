@@ -29,11 +29,11 @@ func NewJWTHandler(keyStore keyStore, logger *log.Logger) *JWTHandler {
 }
 
 // RegisterDefaultPaths registers the default paths for JWKS operations.
-func (j *JWTHandler) RegisterDefaultPaths(api *http.ServeMux) {
+func (h *JWTHandler) RegisterDefaultPaths(api *http.ServeMux) {
 	api.HandleFunc(JWTDefaultPath, func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			j.Post(w, r)
+			h.Post(w, r)
 		default:
 			notFoundResponse(w)
 		}
@@ -41,12 +41,12 @@ func (j *JWTHandler) RegisterDefaultPaths(api *http.ServeMux) {
 }
 
 // Post creates a signed JWT with the provided claims.
-func (j *JWTHandler) Post(w http.ResponseWriter, r *http.Request) {
+func (h *JWTHandler) Post(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var claims jwtmock.Claims
 	if err := jsonUnmarshal(r, &claims); err != nil {
-		j.logger.Errorf("Failed to read claims: %v", err)
+		h.logger.Errorf("Failed to read claims: %v", err)
 
 		w.WriteHeader(http.StatusBadRequest)
 
@@ -54,16 +54,16 @@ func (j *JWTHandler) Post(w http.ResponseWriter, r *http.Request) {
 			Message: "Failed to read claims",
 			Error:   err.Error(),
 		}); err != nil {
-			j.logger.Errorf("Failed write JSON response: %v", err)
+			h.logger.Errorf("Failed write JSON response: %v", err)
 		}
 
 		return
 	}
 
-	signingKey := j.keyStore.GetSigningKey()
+	signingKey := h.keyStore.GetSigningKey()
 	token, err := claims.CreateJWT(signingKey)
 	if err != nil {
-		j.logger.Errorf("Failed to generate JWT: %v", err)
+		h.logger.Errorf("Failed to generate JWT: %v", err)
 
 		w.WriteHeader(http.StatusBadRequest)
 
@@ -71,16 +71,17 @@ func (j *JWTHandler) Post(w http.ResponseWriter, r *http.Request) {
 			Message: "Failed to generate JWT",
 			Error:   err.Error(),
 		}); err != nil {
-			j.logger.Errorf("Failed write JSON response: %v", err)
+			h.logger.Errorf("Failed write JSON response: %v", err)
 		}
 
 		return
 	}
 
 	if err := jsonMarshal(w, jwtResponse{Token: token}); err != nil {
-		j.logger.Errorf("Failed write JSON response: %v", err)
+		h.logger.Errorf("Failed write JSON response: %v", err)
+
+		w.WriteHeader(http.StatusInternalServerError)
+
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }

@@ -10,3 +10,8 @@ type keyStore interface {
 	GetJWKS() *jwk.Set
 	GetSigningKey() *jwtmock.SigningKey
 }
+
+type clientRepo interface {
+	Register(jwtmock.ClientRegistration) error
+	GenerateToken(jwtmock.ClientTokenRequest, *jwtmock.SigningKey) (*jwtmock.ClientTokenResponse, error)
+}

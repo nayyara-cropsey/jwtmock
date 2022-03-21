@@ -39,7 +39,8 @@ func NewServer() (*Server, error) {
 	}
 
 	logger := log.NewLogger(log.WithLevel(log.Debug))
-	handler := handlers.NewHandler(keyStore, logger)
+	clientRepo := service.NewClientRepo()
+	handler := handlers.NewHandler(keyStore, clientRepo, logger)
 	server := httptest.NewServer(handler)
 
 	return &Server{
