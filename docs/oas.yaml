@@ -3,9 +3,11 @@ info:
   title: JWT Mock API
   description: >-
     JWT Mock is an API that is used in tests to mock out an OAuth authorization
-    server. NOTE: endpoints with `/jwtmock` path prefix are used to setup the JWT Mock server. 
-  version: 1.1.0
+    server.
+  version: 1.1.1
 tags:
+  - name: Setup
+    description: For JWT Mock setup
   - name: JWKS
     description: JSON Web Token Keyset
   - name: JWT
@@ -32,7 +34,7 @@ paths:
       responses:
         '201':
           description: Success
-          content: { }
+          content: {}
         '500':
           description: Internal Error
           content:
@@ -42,6 +44,7 @@ paths:
   /jwtmock/generate-jwt:
     post:
       tags:
+        - Setup
         - JWT
       summary: Generates a JWT with the claims posted in the body.
       description: >-
@@ -76,6 +79,7 @@ paths:
   /jwtmock/clients:
     post:
       tags:
+        - Setup
         - Client
       summary: Register a new client for machine-to-machine workflows
       description: Register a new client with a predefined scope
@@ -100,7 +104,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: '#/components/schemas/error'  
   /oauth/token:
     post:
       tags:
@@ -108,7 +112,7 @@ paths:
         - Client
       summary: Generates a token for a client using the requested grant type
       description: >-
-        Generate a token for a client using existing credentails. The client must be registered prior to this call.
+       Generate a token for a client using existing credentails. The client must be registered prior to this call.
       requestBody:
         description: Client request
         content:
@@ -134,7 +138,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: '#/components/schemas/error'                
 
 components:
   schemas:
@@ -216,14 +220,14 @@ components:
       type: object
       properties:
         client_id:
-          type: string
+          type: string 
           description: ID of the client
           example: lq30r49f97sauf
         client_secret:
           type: string
           description: Secret of the client
           example: 9237rofj~dsafj
-        audience:
+        audience: 
           type: string
           description: Audience for the generated JWT
           example: "https://target.api"
@@ -235,11 +239,11 @@ components:
       type: object
       properties:
         access_token:
-          type: string
+          type: string 
           description: JWT generated for client
           example: >-
             eyJhbGciOiJSUzI1NiIsImtpZCI6IkRNSEpNTGFJQWdpMmRVVTYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOlsidGVzdCJdLCJleHAiOjE2NDc4OTM2OTIsImlhdCI6MTY0Nzg5MDA5MiwiaXNzIjoiaHR0cHM6Ly9qd3Rtb2NrLmNvIiwic3ViIjoiMm8zOTQ3dzlmN3M5YWZAY2xpZW50cyIsImF6cCI6IjJvMzk0N3c5ZjdzOWFmIiwiZ3R5IjoiY2xpZW50X2NyZWRlbnRpYWxzIiwic2NvcGUiOiJ1c2VyczpyZWFkIn0.oQZCfXaLCgfymnLB8-Xb6ujJckCL59ot2mCJ5GkjaRXr5UQFtncHJfr9obcPMx9Q7_2TeMp57cicYhmarXMDgAIEHu-rSuL988WiogSm67UojFuVlmp2j1Ne0ZZA5mEjmhkUMOihlCHNtIgCEpmjTtZvcHz-PHwfoID2r3_U3K4
-        scope:
+        scope: 
           type: string
           description: Scope for client
           example: "users:read"
@@ -247,14 +251,14 @@ components:
           type: integer
           description: When the token expires
           example: 1647893692
-        token_type:
+        token_type: 
           type: string
-          example: Bearer
-    clientRegistration:
+          example: Bearer     
+    clientRegistration: 
       type: object
       properties:
         client_id:
-          type: string
+          type: string 
           description: ID of the client
           example: lq30r49f97sauf
         client_secret:
@@ -280,4 +284,4 @@ components:
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/nayyara-cropsey/jwtmock/1.1.0
+    url: https://virtserver.swaggerhub.com/nayyara-cropsey/jwtmock/1.1.1
