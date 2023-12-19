@@ -6,7 +6,7 @@ Examples using CURL and running JWT Mock server locally on port 80.
 
 ```
 curl --request POST \
-  --url http://localhost/generate-jwt \
+  --url http://localhost/jwtmock/generate-jwt \
   --header 'Content-Type: application/json' \
   --data '{
   "iss": "https://auth.mine.go/",
